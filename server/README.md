@@ -13,6 +13,7 @@ DB_USER=root
 DB_PORT=3306
 DB_PASSWORD=password
 DB_DATABASE=stylesnap
+CORS_ORIGIN = http://localhost:5173
 ```
 
 ### 2. Install Node modules
