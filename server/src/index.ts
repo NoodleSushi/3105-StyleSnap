@@ -3,7 +3,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 
-const SERVER_PORT: number = Number(process.env.SERVER_PORT) || 3000;
+const SERVER_PORT: number = Number(process.env.SERVER_PORT);
 
 
 // setup .env
@@ -17,7 +17,7 @@ app.use(bodyParser.urlencoded({extended:true}));
 
 // setup cors
 app.use(cors({
-  origin: [String(process.env.CORS_ORIGIN)],
+  origin: [process.env.CORS_ORIGIN],
   methods: ["GET", "POST", "PUT", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
