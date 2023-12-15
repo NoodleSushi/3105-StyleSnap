@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const DB_DATABASE = process.env.DB_DATABASE
+export const DB_DATABASE = process.env.DB_DATABASE
 
 const DB_OPTIONS: ConnectionOptions = {
   host: process.env.DB_HOST,
@@ -12,9 +12,7 @@ const DB_OPTIONS: ConnectionOptions = {
   password: process.env.DB_PASSWORD,
 };
 
-const db = mysql.createPool({...DB_OPTIONS, database: DB_DATABASE});
-
-const createMultilineConnection = (addDatabaseName: boolean) => {
+export const createMultilineConnection = (addDatabaseName: boolean) => {
   return mysql.createConnection({
     ...DB_OPTIONS,
     multipleStatements: true,
@@ -22,5 +20,7 @@ const createMultilineConnection = (addDatabaseName: boolean) => {
   });
 }
 
+const db = mysql.createPool({...DB_OPTIONS, database: DB_DATABASE});
+
+
 export default db;
-export { createMultilineConnection, DB_DATABASE };

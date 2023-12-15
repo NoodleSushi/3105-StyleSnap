@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
-import { createMultilineConnection, DB_DATABASE } from "./db";
+import { createMultilineConnection, DB_DATABASE } from "../controllers/db";
 import { Connection } from "mysql2";
 
-const generatedScript = fs.readFileSync(path.join(__dirname, "db.sql")).toString();
+const generatedScript = fs.readFileSync(path.join(__dirname, "../models/db.sql")).toString();
 
 (async () => {
   let db: Connection;
