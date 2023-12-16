@@ -7,5 +7,7 @@ declare namespace NodeJS {
     DB_PASSWORD: string;
     DB_DATABASE: string;
     CORS_ORIGIN: string;
+    ACCESS_TOKEN_SCERET: string;
+    REFRESH_TOKEN_SECRET: string;
   }
 }

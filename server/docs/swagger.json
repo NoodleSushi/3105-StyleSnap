@@ -1,0 +1,12 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "StyleSnap"
+  },
+  "schemes": [
+    "http",
+    "https"
+  ],
+  "paths": {},
+  "definitions": {}
+}
