@@ -6,3 +6,4 @@ export interface User {
 }
 
 export type UserAuth = Omit<User, "user_id">;
+export type UserInfo = Omit<User, "password">;

@@ -57,11 +57,11 @@ export const authToken = () => header("authorization")
   .notEmpty()
   .withMessage("Access token not found.")
   .bail()
-  .custom(async (authorization: string) => {
+  .custom(async (authorization: string, { req }) => {
     try {
       const accessToken = authorization.match(/^Bearer (\S+)/)![1];
       const payload = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!);
-      console.log(payload);
+      req.user = payload;
     } catch (err) {
       throw new Error("Access token is invalid.");
     }
