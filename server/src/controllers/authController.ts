@@ -4,12 +4,7 @@ import { createUser, getUser } from "./db";
 import { hashPassword } from "./utils";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-
-interface User {
-  username: string;
-  email: string;
-  password: string;
-}
+import { User, UserAuth } from "../interfaces"
 
 export const createUserAccount: RequestHandler = async (req, res) => {
   const errors = validationResult(req);
@@ -49,7 +44,7 @@ export const loginUser: RequestHandler = async (req, res) => {
   }
 
   try {
-    const user: User = req.body;
+    const user: UserAuth = req.body;
     const userRow = await getUser(user.username, user.email);
     if (!userRow) {
       return res.status(401).json(invalidCredentialsResponse);

@@ -1,6 +1,7 @@
 import mysql, { ConnectionOptions, RowDataPacket } from "mysql2";
 import dotenv from "dotenv";
 import SQL from "sql-template-strings";
+import { User } from "../interfaces";
 
 dotenv.config();
 
@@ -62,7 +63,7 @@ export const isEmailTaken = async (email: string): Promise<boolean> => {
   }
 }
 
-export const getUser = async (username: string, email: string) => {
+export const getUser = async (username: string, email: string): Promise<User | null> => {
   interface Result extends RowDataPacket {
     user_id: number;
     username: string;
