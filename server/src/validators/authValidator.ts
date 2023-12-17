@@ -1,8 +1,6 @@
-import { RequestHandler } from "express";
-import { ValidationChain, body, header } from "express-validator";
-import { isEmailTaken, isUsernameTaken, getUser } from "../controllers/db";
+import { body, header } from "express-validator";
+import { isEmailTaken, isUsernameTaken } from "../controllers/db";
 import jwt from "jsonwebtoken";
-import { hashPassword } from "../controllers/utils";
 
 export const userAuthValidator = () => [
   body("username")
@@ -59,8 +57,9 @@ export const authToken = () => header("authorization")
   .notEmpty()
   .withMessage("Access token not found.")
   .bail()
-  .custom(async (accessToken) => {
+  .custom(async (authorization: string) => {
     try {
+      const accessToken = authorization.match(/^Bearer (\S+)/)![1];
       const payload = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!);
       console.log(payload);
     } catch (err) {

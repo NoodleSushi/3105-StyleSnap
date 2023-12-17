@@ -1,9 +1,33 @@
 import fs from "fs";
-import path from "path";
 import { createMultilineConnection, DB_DATABASE } from "../controllers/db";
 import { Connection } from "mysql2";
+import YAML from "yaml";
 
-const generatedScript = fs.readFileSync(path.join(__dirname, "../models/db.sql")).toString();
+interface Inserts {
+  tables: {
+    name: string;
+    columns: string[];
+    values: (string | number)[][];
+  }[]
+}
+
+const generatedScript = fs.readFileSync("src/models/db.sql").toString();
+
+const inserts = YAML.parse(fs.readFileSync("src/models/inserts.yaml", "utf8")) as Inserts;
+let insertScript = "";
+inserts.tables.forEach((table) => {
+  const columns = table.columns.join(", ");
+  const values = table.values.map((row) => {
+    return `(${row.map((value) => {
+      if (typeof value === "string") {
+        return `'${value}'`;
+      } else {
+        return value;
+      }
+    }).join(", ")})`;
+  }).join(", ");
+  insertScript += `INSERT INTO ${table.name} (${columns}) VALUES ${values};`;
+});
 
 (async () => {
   let db: Connection;
@@ -23,6 +47,13 @@ const generatedScript = fs.readFileSync(path.join(__dirname, "../models/db.sql")
     console.log(err);
   }).then(() => {
     console.log(`Database ${DB_DATABASE} initialized.`);
+  });
+
+  console.log(`Inserting data into database ${DB_DATABASE}...`);
+  await db.promise().query(insertScript).catch((err) => {
+    console.log(err);
+  }).then(() => {
+    console.log(`Data inserted into database ${DB_DATABASE}.`);
   });
   db.end();
 })();

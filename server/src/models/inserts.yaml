@@ -1,0 +1,50 @@
+tables:
+  - name: ClothingCategory
+    columns: [clothing_cat_id, name]
+    values:
+      - [1, Tops]
+      - [2, Bottoms]
+      - [3, Dresses]
+      - [4, Footwear]
+      - [5, Accessories]
+      - [6, Other]
+
+
+  - name: ClothingType
+    columns: [clothing_cat_id, name]
+    values:
+      - [1, T-Shirt]
+      - [1, Tank Top]
+      - [1, Blouse]
+      - [1, Sweater]
+      - [1, Cardigan]
+      - [1, Hoodie]
+      - [1, Jacket]
+      - [1, Coat]
+      - [1, Vest]
+      - [1, Other]
+
+      - [2, Jeans]
+      - [2, Pants]
+      - [2, Shorts]
+      - [2, Skirt]
+      - [2, Other]
+
+      - [3, Casual]
+      - [3, Formal]
+      - [3, Other]
+      
+      - [4, Sneakers]
+      - [4, Boots]
+      - [4, Sandals]
+      - [4, Heels]
+      - [4, Flats]
+      - [4, Other]
+
+      - [5, Hat]
+      - [5, Scarf]
+      - [5, Gloves]
+      - [5, Socks]
+      - [5, Other]
+      
+      - [6, Other]

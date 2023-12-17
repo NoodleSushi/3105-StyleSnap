@@ -11,18 +11,12 @@ interface User {
   password: string;
 }
 
-const baseResponse = {
-  errors: [],
-  message: "",
-}
-
 export const createUserAccount: RequestHandler = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({
-      ...baseResponse,
       message: "Invalid user registration data.",
-      ...errors,
+      errors: errors.array().map((error) => error.msg),
     });
   }
 
@@ -31,14 +25,14 @@ export const createUserAccount: RequestHandler = async (req, res) => {
     const hashedPassword = await hashPassword(user.password);
     await createUser(user.username, user.email, hashedPassword);
     return res.status(201).json({
-      ...baseResponse,
-      message: "User registration successful."
+      message: "User registration successful.",
+      errors: [],
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
-      ...baseResponse,
-      message: "User registration failed."
+      message: "Internal server error.",
+      errors: [],
     });
   }
 }
@@ -47,7 +41,6 @@ export const loginUser: RequestHandler = async (req, res) => {
   const errors = validationResult(req);
 
   const invalidCredentialsResponse = {
-    ...baseResponse,
     message: "Invalid username, email, and/or password."
   };
 
@@ -77,14 +70,12 @@ export const loginUser: RequestHandler = async (req, res) => {
     );
 
     return res.status(200).json({
-      ...baseResponse,
       message: "User login successful.",
       accessToken,
     });
   } catch (err) {
     console.error(err);
     return res.status(500).json({
-      ...baseResponse,
       message: "User login failed."
     });
   }

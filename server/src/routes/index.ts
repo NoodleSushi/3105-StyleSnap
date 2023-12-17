@@ -1,4 +1,4 @@
-import { Express, Router } from "express";
+import { Router } from "express";
 import authRoutes from "./authRoutes";
 import swaggerRouter from "./swaggerRouter";
 const routes: Router = Router();

@@ -1,5 +1,9 @@
 # StyleSnap Server
 
+## API Documentation
+
+Swagger API documentation can be accessed `<scheme>://<host>/api-docs/`
+
 ## Setup Instructions
 
 ### 1. Setup .env file in root directory
@@ -26,6 +30,8 @@ npm install
 
 ### 3. Initialize Database
 
+If an existing database has already been initialized, this command deletes the database and initializes a new one.
+
 ```console
 npm run init-db
 ```
@@ -43,3 +49,8 @@ For dev testing:
 ```console
 npm run dev
 ```
+
+## Recommended Requirements
+
+- Node.js v20.10.0
+- MySQL 8.0.35
