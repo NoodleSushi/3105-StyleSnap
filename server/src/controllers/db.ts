@@ -1,7 +1,7 @@
-import mysql, { ConnectionOptions, RowDataPacket } from "mysql2";
+import mysql, { ConnectionOptions, ResultSetHeader, RowDataPacket } from "mysql2";
 import dotenv from "dotenv";
 import SQL from "sql-template-strings";
-import { User } from "../interfaces";
+import { User, Wardrobe, WardrobeInput } from "../interfaces";
 
 dotenv.config();
 
@@ -81,4 +81,76 @@ export const getUser = async (username: string, email: string): Promise<User | n
   }
 }
 
-export default db;
+export const createWardrobe = async (user_id: number, name: string): Promise<number> => {
+  try {
+    const query = SQL`INSERT INTO Wardrobe (owner, name) VALUES (${user_id}, ${name})`;
+    const [result] = await db.promise().query<ResultSetHeader>(query);
+    const { insertId } = result;
+    return insertId;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getWardrobe = async (wardrobe_id: number): Promise<Wardrobe | null> => {
+  try {
+    const query = SQL`SELECT * FROM Wardrobe WHERE wardrobe_id = ${wardrobe_id}`;
+    const [result] = await db.promise().query<(RowDataPacket & Wardrobe)[]>(query);
+    const row = result && result[0];
+    return row && {
+      wardrobe_id: row.wardrobe_id,
+      owner: row.owner,
+      name: row.name,
+    } || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getUserWardrobes = async (user_id: number): Promise<Wardrobe[]> => {
+  try {
+    const query = SQL`SELECT * FROM Wardrobe WHERE owner = ${user_id}`;
+    const [result] = await db.promise().query<(RowDataPacket & Wardrobe)[]>(query);
+    return result.map(row => ({
+      wardrobe_id: row.wardrobe_id,
+      owner: row.owner,
+      name: row.name,
+    }));
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getAllWardrobes = async (): Promise<Wardrobe[]> => {
+  try {
+    const query = SQL`SELECT * FROM Wardrobe`;
+    const [result] = await db.promise().query<(RowDataPacket & Wardrobe)[]>(query);
+    return result.map(row => ({
+      wardrobe_id: row.wardrobe_id,
+      owner: row.owner,
+      name: row.name,
+    }));
+  } catch (error) {
+    throw error;
+  }
+
+}
+
+export const updateWardrobe = async (wardrobe_id: number, input: WardrobeInput): Promise<boolean> => {
+  try {
+    const query = SQL`UPDATE Wardrobe SET name = ${input.name} WHERE wardrobe_id = ${wardrobe_id}`;
+    const [result] = await db.promise().query<ResultSetHeader>(query);
+    return result.affectedRows > 0;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const deleteWardrobe = async (wardrobe_id: number): Promise<void> => {
+  try {
+    const query = SQL`DELETE FROM Wardrobe WHERE wardrobe_id = ${wardrobe_id}`;
+    await db.promise().query(query);
+  } catch (error) {
+    throw error;
+  }
+}

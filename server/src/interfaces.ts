@@ -14,3 +14,5 @@ export interface Wardrobe {
   owner: number;
   name: string;
 }
+
+export type WardrobeInput = Omit<Wardrobe, "wardrobe_id" | "owner">;
