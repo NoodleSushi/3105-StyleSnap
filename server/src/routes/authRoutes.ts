@@ -7,6 +7,6 @@ const authRoutes = Router();
 
 authRoutes.post('/signup', userAuthValidator(), createUserAccount);
 authRoutes.post('/login', userLoginValidator(), loginUser);
-authRoutes.post('/authtest', authTokenValidator(), attachUser, authTest);
+authRoutes.post('/authtest', authTokenValidator(), attachUser(), authTest);
 
 export default authRoutes;

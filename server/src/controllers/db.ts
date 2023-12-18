@@ -65,11 +65,9 @@ export const isEmailTaken = async (email: string): Promise<boolean> => {
 }
 
 export const getUser = async (username: string, email: string): Promise<User | null> => {
-  type Result = RowDataPacket & User;
-
   try {
     const query = SQL`SELECT * FROM User WHERE username = ${username} AND email = ${email} LIMIT 1`;
-    const [result] = await db.promise().query<Result[]>(query);
+    const [result] = await db.promise().query<(RowDataPacket & User)[]>(query);
     const row = result && result[0];
     return row && {
       user_id: row.user_id,

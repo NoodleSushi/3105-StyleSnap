@@ -3,38 +3,40 @@ import { validationResult } from "express-validator";
 import { createUser, getUser } from "./db";
 import { hashPassword, comparePassword, createAccessToken, userInfoResult } from "./authUtils";
 import { User, UserAuth, UserInfo } from "../interfaces";
-import { resServerErrorGen, resGen as statusGen, validationResGen } from "./utils";
+import { statusServerError, statusSuccessful, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError } from "./utils";
 import jwt from "jsonwebtoken";
 
-export const attachUser: RequestHandler = async (req: Request, res, next) => {
+export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "user") => async (req: Request, res, next) => {
   try {
     const authorization = req.headers.authorization || "";
     const accessToken = authorization.match(/^Bearer (\S+)/)![1];
-    const payload = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!) as UserInfo;
-    (req as any).user = payload;
+    const user = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!) as UserInfo;
+    if (mode === "admin" && !user.is_admin)
+      return statusClientForbiddenError(res);
+    (req as any).user = user;
   } catch (err) {
-    return statusGen(res, 401, "Invalid access token.")
+    return statusClientUnauthorizedError(res, "Invalid access token.")
   }
   next();
 }
 
 export const createUserAccount: RequestHandler = async (req, res) => {
-  const validationRes = validationResGen(req, res, 422, "Invalid user registration data.", "batch");
-  if (validationRes)
-    return validationRes;
+  const statusValidErr = statusValidationError(req, res, "Invalid user registration data.", "batch");
+  if (statusValidErr)
+    return statusValidErr;
 
   try {
     const user: User = req.body;
     const hashedPassword = await hashPassword(user.password);
     await createUser(user.username, user.email, hashedPassword);
-    return statusGen(res, 201, "User registration successful.");
+    return statusSuccessful(res, 201, "User registration successful.");
   } catch (err) {
-    return resServerErrorGen(res);
+    return statusServerError(res);
   }
 }
 
 export const loginUser: RequestHandler = async (req, res) => {
-  const failResGen = () => statusGen(res, 401, "Invalid username, email, and/or password.");
+  const failResGen = () => statusClientUnauthorizedError(res, "Invalid username, email, and/or password.");
   const errors = validationResult(req);
 
   if (!errors.isEmpty())
@@ -57,9 +59,9 @@ export const loginUser: RequestHandler = async (req, res) => {
       is_admin: userRow.is_admin,
     });
 
-    return statusGen(res, 200, "User login successful.", { accessToken });
+    return statusSuccessful(res, 200, "User login successful.", { accessToken });
   } catch (err) {
-    return resServerErrorGen(res);
+    return statusServerError(res);
   }
 }
 
