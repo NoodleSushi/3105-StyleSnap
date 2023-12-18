@@ -2,34 +2,42 @@ import fs from "fs";
 import { createMultilineConnection, DB_DATABASE } from "../controllers/db";
 import { Connection } from "mysql2";
 import YAML from "yaml";
+import { hashPassword } from "../controllers/utils";
 
 interface Inserts {
   tables: {
     name: string;
     columns: string[];
-    values: (string | number)[][];
+    values: (string | number | boolean | { passHash?: string })[][];
   }[]
 }
 
 const generatedScript = fs.readFileSync("src/models/db.sql").toString();
-
 const inserts = YAML.parse(fs.readFileSync("src/models/inserts.yaml", "utf8")) as Inserts;
-let insertScript = "";
-inserts.tables.forEach((table) => {
-  const columns = table.columns.join(", ");
-  const values = table.values.map((row) => {
-    return `(${row.map((value) => {
-      if (typeof value === "string") {
-        return `'${value}'`;
-      } else {
-        return value;
-      }
-    }).join(", ")})`;
-  }).join(", ");
-  insertScript += `INSERT INTO ${table.name} (${columns}) VALUES ${values};`;
-});
 
 (async () => {
+  let insertScript = "";
+
+  for (const table of inserts.tables) {
+    const columns = table.columns.join(", ");
+    const values = (await Promise.all(table.values.map(async (row) => {
+      return `(${await Promise.all(row.map(async (value) => {
+        if (typeof value === "object" && value.passHash) {
+          return `'${await hashPassword(value.passHash)}'`;
+        } else if (typeof value === "string") {
+          return `'${value}'`;
+        } else if (typeof value === "boolean") {
+          return value ? 1 : 0;
+        } else if (typeof value === "number") {
+          return value;
+        } else {
+          throw new Error("Invalid value type.");
+        }
+      }))})`;
+    }))).join(", ");
+    insertScript += `INSERT INTO ${table.name} (${columns}) VALUES ${values};`;
+  }
+  
   let db: Connection;
 
   db = createMultilineConnection(false);
