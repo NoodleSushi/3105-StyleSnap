@@ -1,91 +1,79 @@
-import { RequestHandler } from "express";
+import { Request, RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import { createUser, getUser } from "./db";
-import { hashPassword } from "./utils";
-import bcrypt from "bcrypt";
+import { hashPassword, comparePassword, createAccessToken, userInfoResult } from "./authUtils";
+import { User, UserAuth, UserInfo } from "../interfaces";
+import { statusServerError, statusSuccessful, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError } from "./utils";
 import jwt from "jsonwebtoken";
 
-interface User {
-  username: string;
-  email: string;
-  password: string;
-}
-
-const baseResponse = {
-  errors: [],
-  message: "",
+export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "user") => async (req: Request, res, next) => {
+  try {
+    const authorization = req.headers.authorization || "";
+    const accessToken = authorization.match(/^Bearer (\S+)/)![1];
+    const user = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!) as UserInfo;
+    if (mode === "admin" && !user.is_admin)
+      return statusClientForbiddenError(res);
+    (req as any).user = user;
+  } catch (err) {
+    return statusClientUnauthorizedError(res, "Invalid access token.")
+  }
+  next();
 }
 
 export const createUserAccount: RequestHandler = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(422).json({
-      ...baseResponse,
-      message: "Invalid user registration data.",
-      ...errors,
-    });
-  }
+  const statusValidErr = statusValidationError(req, res, "Invalid user registration data.", "batch");
+  if (statusValidErr)
+    return statusValidErr;
 
   try {
     const user: User = req.body;
     const hashedPassword = await hashPassword(user.password);
     await createUser(user.username, user.email, hashedPassword);
-    return res.status(201).json({
-      ...baseResponse,
-      message: "User registration successful."
-    });
+    return statusSuccessful(res, 201, "User registration successful.");
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      ...baseResponse,
-      message: "User registration failed."
-    });
+    return statusServerError(res);
   }
 }
 
 export const loginUser: RequestHandler = async (req, res) => {
+  const failResGen = () => statusClientUnauthorizedError(res, "Invalid username, email, and/or password.");
   const errors = validationResult(req);
 
-  const invalidCredentialsResponse = {
-    ...baseResponse,
-    message: "Invalid username, email, and/or password."
-  };
-
-  if (!errors.isEmpty()) {
-    return res.status(401).json(invalidCredentialsResponse);
-  }
+  if (!errors.isEmpty())
+    return failResGen();
 
   try {
-    const user: User = req.body;
-    const userRow = await getUser(user.username, user.email);
-    if (!userRow) {
-      return res.status(401).json(invalidCredentialsResponse);
-    }
+    const userAuth: UserAuth = req.body;
+    const userRow = await getUser(userAuth.username, userAuth.email);
+    if (!userRow)
+      return failResGen();
     
-    const isPasswordValid = await bcrypt.compare(user.password, userRow.password);
-    if (!isPasswordValid) {
-      return res.status(401).json(invalidCredentialsResponse);
-    }
+    const isPasswordValid = await comparePassword(userAuth.password, userRow.password);
+    if (!isPasswordValid) 
+      return failResGen();
 
-    const accessToken = jwt.sign(
-      {
-        user_id: userRow.user_id,
-        username: userRow.username,
-        email: userRow.email,
-      },
-      process.env.ACCESS_TOKEN_SCERET!,
-    );
-
-    return res.status(200).json({
-      ...baseResponse,
-      message: "User login successful.",
-      accessToken,
+    const accessToken = createAccessToken({
+      user_id: userRow.user_id,
+      username: userRow.username,
+      email: userRow.email,
+      is_admin: userRow.is_admin,
     });
+
+    return statusSuccessful(res, 200, "User login successful.", { accessToken });
   } catch (err) {
-    console.error(err);
-    return res.status(500).json({
-      ...baseResponse,
-      message: "User login failed."
+    return statusServerError(res);
+  }
+}
+
+export const authTest: RequestHandler = (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(401).json({
+      message: errors.array()[0].msg,
     });
   }
+  res.json({
+    message: "You have a valid access token.",
+    user: userInfoResult(req),
+  });
 }
