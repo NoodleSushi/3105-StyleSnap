@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Navbar from '../components/TopNav';
 import ClothingItem from '../components/ClothingItem'; // Import the ClothingItem component
@@ -43,6 +42,7 @@ const MenuItem = styled.div`
   padding: 10px;
   display: flex;
   align-items: center;
+  justify-content: space-between;  // Add this line to align content horizontally
 `;
 
 const MenuArrow = styled.div<{ isOpen: boolean }>`
@@ -53,9 +53,15 @@ const MenuArrow = styled.div<{ isOpen: boolean }>`
 
 const CollapsibleContent = styled.div<{ isOpen: boolean }>`
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
+  overflow: auto;  // Change this line to make the content scrollable
+  max-height: 200px;  // Adjust the max height as needed
 `;
 
-
+const RowContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+`;
 
 const CreateOutfit: React.FC = () => {
   const [selectedWardrobe, setSelectedWardrobe] = useState<string>('');
@@ -82,7 +88,6 @@ const CreateOutfit: React.FC = () => {
       return updatedItems;
     });
   };
-  
 
   const handleCardClick = (card: string) => {
     setSelectedCards((prevSelectedCards) => {
@@ -96,7 +101,6 @@ const CreateOutfit: React.FC = () => {
       }
     });
   };
-  
 
   const handleRemoveCard = (card: string) => {
     console.log('Removing card:', card); // Add this line for debugging
@@ -122,17 +126,19 @@ const CreateOutfit: React.FC = () => {
                   <MenuArrow isOpen={item.isOpen}>▶</MenuArrow>
                 </MenuItem>
                 <CollapsibleContent isOpen={item.isOpen}>
-                  {/* Render ClothingItem components for this category */}
-                  {item.cards.map((card, cardIndex) => (
-                    <ClothingItem
-                      key={cardIndex}
-                      imageUrl={`your_image_url_${cardIndex + 1}.jpg`}
-                      itemName={card}
-                      onClick={() => handleCardClick(card)} onRemove={function (): void {
-                        throw new Error('Function not implemented.');
-                      } } showRemoveButton={false}
-                    />
-                  ))}
+                  {/* Render ClothingItem components for this category in rows */}
+                  <RowContainer>
+                    {item.cards.map((card, cardIndex) => (
+                      <ClothingItem
+                        key={cardIndex}
+                        imageUrl={`your_image_url_${cardIndex + 1}.jpg`}
+                        itemName={card}
+                        onClick={() => handleCardClick(card)}
+                        onRemove={() => handleRemoveCard(card)}
+                        showRemoveButton={false}
+                      />
+                    ))}
+                  </RowContainer>
                 </CollapsibleContent>
               </div>
             ))}
@@ -140,15 +146,15 @@ const CreateOutfit: React.FC = () => {
         </LeftColumn>
 
         <LargeCard>
-        {selectedCards.map((selectedCard, index) => (
-          <ClothingItem
+          {selectedCards.map((selectedCard, index) => (
+            <ClothingItem
               key={selectedCard}
-              imageUrl={`your_image_url_${index + 1}.jpg`}
+              imageUrl ={`your_image_url_${index + 1}.jpg`}
               itemName={selectedCard}
               onClick={() => handleCardClick(selectedCard)}
               onRemove={() => handleRemoveCard(selectedCard)}
               showRemoveButton={true} // Corrected syntax
-          />
+            />
           ))}
         </LargeCard>
       </ContentContainer>
@@ -157,5 +163,3 @@ const CreateOutfit: React.FC = () => {
 };
 
 export default CreateOutfit;
-
-

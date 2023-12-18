@@ -27,28 +27,33 @@ const RemoveButton = styled.button<{ showRemoveButton: boolean }>`
 `;
 
 interface ClothingItemProps {
-    imageUrl: string;
-    itemName: string;
-    onClick: () => void;
-    onRemove: () => void;
-    showRemoveButton: boolean;
-  }
+  imageUrl: string;
+  itemName: string;
+  onClick: () => void;
+  onRemove: () => void;
+  showRemoveButton: boolean;
+}
 
-  const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick, onRemove, showRemoveButton }) => {
-    const handleClick = (e: React.MouseEvent) => {
-      e.stopPropagation(); // Prevent the click event from reaching the parent container
-      onClick();
-    };
-  
-    return (
-      <ClothingItemContainer onClick={handleClick}>
-        <Image src={imageUrl} alt={itemName} />
-        <RemoveButton showRemoveButton={showRemoveButton} onClick={onRemove}>
-          Remove
-        </RemoveButton>
-      </ClothingItemContainer>
-    );
+const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick, onRemove, showRemoveButton }) => {
+  const handleClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the click event from reaching the parent container
+    onClick();
   };
-  
-  
-  export default ClothingItem;
+
+  const handleRemoveClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the click event from reaching the parent container
+    onRemove();
+  };
+
+  return (
+    <ClothingItemContainer onClick={handleClick}>
+      <Image src={imageUrl} alt={itemName} />
+      <RemoveButton showRemoveButton={showRemoveButton} onClick={handleRemoveClick}>
+        Remove
+      </RemoveButton>
+    </ClothingItemContainer>
+  );
+};
+
+export default ClothingItem;
+
