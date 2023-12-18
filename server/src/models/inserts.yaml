@@ -1,4 +1,9 @@
 tables:
+  - name: User
+    columns: [username, email, password, is_admin]
+    values:
+      - [adminuser, admin@gmail.com, {passHash: AdminPass123}, TRUE]
+
   - name: ClothingCategory
     columns: [clothing_cat_id, name]
     values:

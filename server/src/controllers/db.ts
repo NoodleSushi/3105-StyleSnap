@@ -42,8 +42,8 @@ export const isUsernameTaken = async (username: string): Promise<boolean> => {
   try {
     const query = SQL`SELECT EXISTS (SELECT * FROM User WHERE username = ${username}) AS isTaken`;
     const [result] = await db.promise().query<Result[]>(query);
-    console.log(result);
-    return result[0].isTaken == 1;
+    const row = result && result[0];
+    return row && row.isTaken == 1 || false;
   } catch (error) {
     throw error;
   }
@@ -57,24 +57,27 @@ export const isEmailTaken = async (email: string): Promise<boolean> => {
   try {
     const query = SQL`SELECT EXISTS (SELECT * FROM User WHERE email = ${email}) AS isTaken`;
     const [result] = await db.promise().query<Result[]>(query);
-    return result[0].isTaken == 1;
+    const row = result && result[0];
+    return row && row.isTaken == 1 || false;
   } catch (error) {
     throw error;
   }
 }
 
 export const getUser = async (username: string, email: string): Promise<User | null> => {
-  interface Result extends RowDataPacket {
-    user_id: number;
-    username: string;
-    email: string;
-    password: string;
-  }
+  type Result = RowDataPacket & User;
 
   try {
     const query = SQL`SELECT * FROM User WHERE username = ${username} AND email = ${email} LIMIT 1`;
     const [result] = await db.promise().query<Result[]>(query);
-    return result && result[0] || null;
+    const row = result && result[0];
+    return row && {
+      user_id: row.user_id,
+      username: row.username,
+      email: row.email,
+      password: row.password,
+      is_admin: Boolean(row.is_admin)
+    } || null;
   } catch (error) {
     throw error;
   }

@@ -1,4 +1,4 @@
-swagger: "2.0"
+openapi: 3.0.0
 info:
   title: StyleSnap API
   version: 1.0.0
@@ -9,99 +9,181 @@ paths:
   /auth/signup:
     post:
       tags:
-        - User
+        - Auth
       summary: Sign up a new user
-      parameters:
-        - name: body
-          in: body
-          description: User object
-          required: true
-          schema:
-            $ref: "#/definitions/User"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAuth"
+            example:
+              username: johndoe
+              password: Password123
+              email: johndoe@gmail.com
       responses:
         201:
           description: User registration successful.
-          schema:
-            $ref: "#/definitions/BaseResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                message: User registration successful.
         422:
           description: Invalid user registration data.
-          schema:
-            allOf:
-              - $ref: "#/definitions/BaseResponse"
-              - type: object
-                properties:
-                  errors:
-                    type: array
-                    items:
-                      type: string
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      errors:
+                        type: array
+                        items:
+                          type: string
+              example:
+                message: Invalid user registration data.
+                errors:
+                  - Username must be at least 6 characters long.
+                  - Password must be at least 8 characters long.
+                  - Email must be a valid email address.
         500:
           description: Internal server error.
-          schema:
-            $ref: "#/definitions/BaseResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/500Response"
   /auth/login:
     post:
       tags:
-        - User
+        - Auth
       summary: Login a user
-      parameters:
-        - name: body
-          in: body
-          description: User object
-          required: true
-          schema:
-            $ref: "#/definitions/User"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserAuth"
+            examples:
+              member:
+                value:
+                  username: johndoe
+                  password: Password123
+                  email: johndoe@gmail.com
+              admin:
+                value:
+                  username: adminuser
+                  password: AdminPass123
+                  email: admin@gmail.com
       responses:
         200:
           description: User login successful.
-          schema:
-            allOf:
-              - $ref: "#/definitions/BaseResponse"
-              - type: object
-                properties:
-                  accessToken:
-                    type: string
-        422:
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      accessToken:
+                        type: string
+              example:
+                message: User login successful.
+                accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTdHlsZVNuYXAiLCJzdWIiOiJ
+        401:
           description: Invalid user login data.
-          schema:
-            $ref: "#/definitions/BaseResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                message: Invalid username, email, and/or password.
         500:
           description: Internal server error.
-          schema:
-            $ref: "#/definitions/BaseResponse"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/500Response"
   /auth/authtest:
     post:
       tags:
-        - User
+        - Auth
       summary: Test authentication
       security:
         - jwt: []
       responses:
         200:
           description: Authentication successful.
-          schema:
-            $ref: "#/definitions/BaseResponse"
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      user:
+                        $ref: "#/components/schemas/UserInfo"
+              example:
+                message: Authentication successful.
+                user:
+                  user_id: 1
+                  username: johndoe
+                  email: johndoe@gmail.com
+                  is_admin: false
         401:
           description: Authentication failed.
-          schema:
-            $ref: "#/definitions/BaseResponse"
-definitions:
-  BaseResponse:
-    type: object
-    properties:
-      message:
-        type: string
-  User:
-    type: object
-    properties:
-      username:
-        type: string
-        example: "johndoe"
-      password:
-        type: string
-        example: "password"
-      email:
-        type: string
-        example: "johndoe@email.com"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                message: Authentication failed.
+components:
+  schemas:
+    BaseResponse:
+      type: object
+      properties:
+        message:
+          type: string
+    500Response:
+      $ref: "#/components/schemas/BaseResponse"
+      example:
+        message: Internal server error.
+    UserBase:
+      type: object
+      properties:
+        username:
+          type: string
+          example: johndoe
+        email:
+          type: string
+          example: johndoe@gmail.com
+    UserAuth:
+      allOf:
+        - $ref: "#/components/schemas/UserBase"
+        - type: object
+          properties:
+            password:
+              type: string
+              example: Password123
+    UserInfo:
+      allOf:
+        - $ref: "#/components/schemas/UserBase"
+        - type: object
+          properties:
+            user_id:
+              type: integer
+              example: 1
+            is_admin:
+              type: boolean
+              example: false
+
+  securitySchemes:
+    jwt:
+      type: apiKey
+      name: Authorization
+      in: header
   
 securityDefinitions:
   jwt:

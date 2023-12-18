@@ -2,7 +2,7 @@ import fs from "fs";
 import { createMultilineConnection, DB_DATABASE } from "../controllers/db";
 import { Connection } from "mysql2";
 import YAML from "yaml";
-import { hashPassword } from "../controllers/utils";
+import { hashPassword } from "../controllers/authUtils";
 
 interface Inserts {
   tables: {
