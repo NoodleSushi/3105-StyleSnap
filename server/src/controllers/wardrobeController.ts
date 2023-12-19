@@ -1,5 +1,5 @@
 import { RequestHandler } from "express";
-import { statusServerError, statusSuccessful, statusValidationError, statusClientNotFoundError, statusClientUnauthorizedError } from "./utils";
+import { statusServerError, statusSuccessful, statusValidationError, statusClientNotFoundError, statusClientUnauthorizedError } from "./responseGenerators";
 import { WardrobeInput } from "../interfaces";
 import { userInfoResult } from "./authUtils";
 import * as db from "./db";
@@ -18,7 +18,7 @@ export const createWardrobe: RequestHandler = async (req, res) => {
     const wardrobe_id = await db.createWardrobe(user_id, wardrobe.name);
     return statusSuccessful(res, 201, "Wardrobe creation successful.", { wardrobe_id });
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -43,7 +43,7 @@ export const getWardrobes: (mode: "user" | "admin" | "param") => RequestHandler 
     const wardrobes = await db.getUserWardrobes(user_id);
     return statusSuccessful(res, 200, "User wardrobes retrieval successful.", { wardrobes });
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -67,7 +67,7 @@ export const getWardrobe: RequestHandler = async (req, res) => {
     
     return statusSuccessful(res, 200, "Wardrobe retrieval successful.", { wardrobe });
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -96,7 +96,7 @@ export const updateWardrobe: RequestHandler = async (req, res) => {
 
     return statusSuccessful(res, 200, "Wardrobe update successful.");
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -121,6 +121,6 @@ export const deleteWardrobe: RequestHandler = async (req, res) => {
     await db.deleteWardrobe(wardrobe_id);
     return statusSuccessful(res, 200, "Wardrobe deletion successful.");
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }

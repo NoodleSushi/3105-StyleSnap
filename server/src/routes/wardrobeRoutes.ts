@@ -2,7 +2,8 @@ import { Router } from "express";
 import { authTokenValidator } from "../validators/authValidator";
 import { attachUser } from "../controllers/authController";
 import { createWardrobe, deleteWardrobe, getWardrobe, getWardrobes, updateWardrobe } from "../controllers/wardrobeController";
-import { userIdParamValidator, wardrobeIdParamValidator, wardrobeValidator } from "../validators/wardrobeValidator";
+import { wardrobeIdParamValidator, wardrobeValidator } from "../validators/wardrobeValidator";
+import { userIdParamValidator } from "../validators/generalValidator";
 
 const wardrobeRoutes = Router();
 
