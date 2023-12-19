@@ -3,7 +3,7 @@ import { validationResult } from "express-validator";
 import { createUser, getUser } from "./db";
 import { hashPassword, comparePassword, createAccessToken, userInfoResult } from "./authUtils";
 import { User, UserAuth, UserInfo } from "../interfaces";
-import { statusServerError, statusSuccessful, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError } from "./utils";
+import { statusServerError, statusSuccessful, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError } from "./responseGenerators";
 import jwt from "jsonwebtoken";
 
 export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "user") => async (req: Request, res, next) => {
@@ -31,7 +31,7 @@ export const createUserAccount: RequestHandler = async (req, res) => {
     await createUser(user.username, user.email, hashedPassword);
     return statusSuccessful(res, 201, "User registration successful.");
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -61,7 +61,7 @@ export const loginUser: RequestHandler = async (req, res) => {
 
     return statusSuccessful(res, 200, "User login successful.", { accessToken });
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 

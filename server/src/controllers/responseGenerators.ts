@@ -31,7 +31,7 @@ export const statusSuccessful = (res: Response, code: number, msg: string, add: 
   });
 }
 
-export const statusServerError = (res: Response, err?: Error): Response => {
+export const statusServerError = (res: Response, err?: any): Response => {
   if (err)
     console.error(err);
   return res.status(500).json({
