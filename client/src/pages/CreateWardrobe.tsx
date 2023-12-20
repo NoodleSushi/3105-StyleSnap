@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../components/TopNav';
 import ClothingItem from '../components/ClothingItem';
 import styled from 'styled-components';
 import Footer from '../components/Footer';
 import UploadItem from '../components/UploadItem';
 import AddWardrobe from '../components/AddWardrobe';
+import WardrobeSelect from '../components/WardrobeSelect';
+import ShimmerEffect from '../components/ShimmerEffect';
 
 const PageContainer = styled.div`
   display: flex;
@@ -32,6 +34,11 @@ const RightColumn = styled.div`
   flex-wrap: wrap; /* Allow flex items to wrap to the next row */
   justify-content: space-between; /* Distribute items evenly along the row */
   width: 100%; /* Adjusted width to take up half of the page */
+`;
+
+const WardrobeInfoContainer = styled.div`
+  width: 100%; /* Ensure full width */
+  margin-bottom: 20px; /* Add margin between the <p> and VerticalMenu */
 `;
 
 const Dropdown = styled.select`
@@ -80,6 +87,22 @@ const RowContainer = styled.div`
 
 const CreateWardrobe: React.FC = () => {
   const [selectedWardrobe, setSelectedWardrobe] = useState<string>('wardrobe1');
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Simulate an asynchronous operation (e.g., fetching data)
+    const fetchData = async () => {
+      // Simulate a delay (you can replace this with actual data fetching)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setIsLoading(false); // Set loading to false once data is fetched
+    };
+
+    fetchData();
+  }, []);
+
+  const handleWardrobeChange = (value: string) => {
+    setSelectedWardrobe(value);
+  };
 
   // Sample data for ClothingItem components
   const clothingItems = [
@@ -123,55 +146,58 @@ const CreateWardrobe: React.FC = () => {
   };
 
   return (
+
     <PageContainer>
       <Navbar />
-
+      {isLoading ? (
+        <ShimmerEffect style={{ flex: 1, padding: '2rem' }} />
+      ) : (
+      <>
       <ContentContainer>
-        <LeftColumn>
-          {/* Dropdown for selecting between Wardrobe 1 and 2 */}
-          <Dropdown onChange={(e) => setSelectedWardrobe(e.target.value)}>
-            <option value="wardrobe1">Wardrobe 1</option>
-            <option value="wardrobe2">Wardrobe 2</option>
-          </Dropdown>
-         <AddWardrobe onClick={() => console.log('Add Wardrobe clicked')} />
-        </LeftColumn>
+            <LeftColumn>
+            <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} />
+              <AddWardrobe onClick={() => console.log('Add Wardrobe clicked')} />
+            </LeftColumn>
 
-        <RightColumn>
+            <RightColumn>
+              <WardrobeInfoContainer>
+                <p>Add Items into Your Wardrobe</p>
+                {/* Vertical Menu replicated from CreateOutfit */}
+                <VerticalMenu>
+                  {menuItems.map((item, index) => (     
+                    <div key={index}>
+                      <MenuItem onClick={() => toggleMenu(index)}>
+                        {item.category}
+                        <MenuArrow isOpen={item.isOpen}>▶</MenuArrow>
+                      </MenuItem>
 
-          {/* Vertical Menu replicated from CreateOutfit */}
-          <VerticalMenu>
-            {menuItems.map((item, index) => (
-              <div key={index}>
-                <MenuItem onClick={() => toggleMenu(index)}>
-                  {item.category}
-                  <MenuArrow isOpen={item.isOpen}>▶</MenuArrow>
-                </MenuItem>
+                      <CollapsibleContent isOpen={item.isOpen}>
+                        <RowContainer>
+                          {item.cards.map((card, cardIndex) => (
+                            <ClothingItem
+                              key={cardIndex}
+                              imageUrl={`your_image_url_${cardIndex + 1}.jpg`}
+                              itemName={card}
+                              onClick={() => handleCardClick(card)}
+                              onRemove={() => handleRemoveCard(card)}
+                              onDelete={() => handleDeleteClick()}
+                              showRemoveButton={false}
+                              createWardrobeContext={true} />
+                          ))}
+                        </RowContainer>
+                      </CollapsibleContent>
+                    </div>
+                  ))}
 
-                <CollapsibleContent isOpen={item.isOpen}>
-                  <RowContainer>
-                    {item.cards.map((card, cardIndex) => (
-                      <ClothingItem
-                        key={cardIndex}
-                        imageUrl={`your_image_url_${cardIndex + 1}.jpg`}
-                        itemName={card}
-                        onClick={() => handleCardClick(card)}
-                        onRemove={() => handleRemoveCard(card)}
-                        onDelete={() => handleDeleteClick()}
-                        showRemoveButton={false}
-                        createWardrobeContext={true}
-                      />
-                    ))}
-                  </RowContainer>
-                </CollapsibleContent>
-              </div>
-            ))}
+                  <UploadItem onClick={() => console.log('Upload button clicked')} />
+                </VerticalMenu>
+              </WardrobeInfoContainer>
+            </RightColumn>
+          </ContentContainer>
 
-            <UploadItem onClick={() => console.log('Upload button clicked')} />
-
-          </VerticalMenu>
-        </RightColumn>
-      </ContentContainer>
-      <Footer />
+          <Footer />
+       </>
+       )}
     </PageContainer>
   );
 };

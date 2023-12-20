@@ -3,6 +3,7 @@ import Navbar from '../components/TopNav';
 import ClothingItem from '../components/ClothingItem'; // Import the ClothingItem component
 import styled from 'styled-components';
 import Outfit from '../components/Outfit';
+import WardrobeSelect from '../components/WardrobeSelect';
 import SaveButton from '../components/SaveOutfit';
 import ShimmerEffect from '../components/ShimmerEffect';
 import Footer from '../components/Footer';
@@ -147,14 +148,10 @@ const CreateOutfit: React.FC = () => {
       { isLoading ? (
         <ShimmerEffect style={{ flex: 1, padding: '2rem' }} />
       ) : (
+      <>
       <ContentContainer>
         <LeftColumn>
-          <Dropdown onChange={(e) => handleWardrobeChange(e.target.value)}>
-            {/* Your dropdown options */}
-            <option value="wardrobe1">Wardrobe 1</option>
-            <option value="wardrobe2">Wardrobe 2</option>
-          </Dropdown>
-
+        <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} />
           <VerticalMenu>
             {menuItems.map((item, index) => (
               <div key={index}>
@@ -202,8 +199,10 @@ const CreateOutfit: React.FC = () => {
           <SaveButton onClick={() => console.log('Save button clicked')} />
         </RightColumn>
       </ContentContainer>
-      )}
+
     <Footer />
+    </>
+    )}
     </PageContainer>
   );
 };
