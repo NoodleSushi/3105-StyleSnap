@@ -1,7 +1,7 @@
 import mysql, { ConnectionOptions, ResultSetHeader, RowDataPacket } from "mysql2";
 import dotenv from "dotenv";
 import SQL from "sql-template-strings";
-import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, Wardrobe, WardrobeUserInput, WardrobeInput } from "../interfaces";
+import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, Wardrobe, WardrobeUserInput, WardrobeInput, Clothing } from "../interfaces";
 
 dotenv.config();
 
@@ -141,6 +141,111 @@ export const updateWardrobe = async (wardrobeId: number, input: WardrobeUserInpu
 export const deleteWardrobe = async (wardrobeId: number): Promise<void> => {
   try {
     const query = SQL`DELETE FROM Wardrobe WHERE wardrobe_id = ${wardrobeId}`;
+    await db.promise().query(query);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getClothingTypeHierarchy = async () => {
+  try {
+    const hierarchy: (ClothingCategory & { types: ClothingType[]})[] = [];
+    const [cat_result] = await db.promise().query<(RowDataPacket)[]>(SQL`SELECT * FROM ClothingCategory`);
+    for (const cat_row of cat_result) {
+      console.log(cat_row);
+      const { clothing_cat_id: clothingCatId, name } = cat_row;
+      const [type_result] = await db.promise().query<(RowDataPacket)[]>(SQL`SELECT * FROM ClothingType WHERE clothing_cat_id = ${clothingCatId}`);
+      const types: ClothingType[] = type_result.map(type_row => (
+        {
+          clothingTypeId: type_row.clothing_type_id,
+          clothingCatId: type_row.clothing_cat_id,
+          name: type_row.name
+        }
+      ));
+      hierarchy.push({ clothingCatId, name, types });
+    }
+    return hierarchy;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getClothingType = async (clothingTypeId: number): Promise<ClothingType | null> => {
+  try {
+    const query = SQL`SELECT * FROM ClothingType WHERE clothing_type_id = ${clothingTypeId}`;
+    const [result] = await db.promise().query<(RowDataPacket)[]>(query);
+    const row = result && result[0];
+    return row && {
+      clothingTypeId: row.clothing_type_id,
+      clothingCatId: row.clothing_cat_id,
+      name: row.name,
+    } || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getClothingCategory = async (clothingCatId: number): Promise<ClothingCategory | null> => {
+  try {
+    const query = SQL`SELECT * FROM ClothingCategory WHERE clothing_cat_id = ${clothingCatId}`;
+    const [result] = await db.promise().query<(RowDataPacket)[]>(query);
+    const row = result && result[0];
+    return row && {
+      clothingCatId: row.clothing_cat_id,
+      name: row.name,
+    } || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const createClothing = async (clothing: ClothingInput): Promise<number> => {
+  try {
+    const query = SQL`INSERT INTO Clothing (wardrobe_id, clothing_type_id, name, image) VALUES (${clothing.wardrobeId}, ${clothing.clothingTypeId}, ${clothing.name}, ${clothing.image})`;
+    const [result] = await db.promise().query<ResultSetHeader>(query);
+    const { insertId } = result;
+    return insertId;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getClothing = async (clothingId: number): Promise<Clothing | null> => {
+  try {
+    const query = SQL`SELECT * FROM Clothing WHERE clothing_id = ${clothingId}`;
+    const [result] = await db.promise().query<(RowDataPacket)[]>(query);
+    const row = result && result[0];
+    return row && {
+      clothingId: row.clothing_id,
+      wardrobeId: row.wardrobe_id,
+      clothingTypeId: row.clothing_type_id,
+      name: row.name,
+      image: row.image,
+    } || null;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getClothingByWardrobe = async (wardrobeId: number): Promise<Clothing[]> => {
+  try {
+    const query = SQL`SELECT * FROM Clothing WHERE wardrobe_id = ${wardrobeId}`;
+    const [result] = await db.promise().query<(RowDataPacket)[]>(query);
+    return result.map(row => ({
+      clothingId: row.clothing_id,
+      wardrobeId: row.wardrobe_id,
+      clothingTypeId: row.clothing_type_id,
+      name: row.name,
+      image: row.image,
+    }));
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const deleteClothing = async (clothingId: number): Promise<void> => {
+  try {
+    const query = SQL`DELETE FROM Clothing WHERE clothing_id = ${clothingId}`;
     await db.promise().query(query);
   } catch (error) {
     throw error;

@@ -18,3 +18,24 @@ export interface Wardrobe {
 
 export type WardrobeUserInput = Omit<Wardrobe, "wardrobeId" | "owner">;
 export type WardrobeInput = Omit<Wardrobe, "wardrobeId">;
+
+export interface ClothingCategory {
+  clothingCatId: number;
+  name: string;
+}
+
+export interface ClothingType {
+  clothingTypeId: number;
+  clothingCatId: number;
+  name: string;
+}
+
+export interface Clothing {
+  clothingId: number;
+  wardrobeId: number;
+  clothingTypeId: number;
+  name: string;
+  image: string;
+}
+
+export type ClothingInput = Omit<Clothing, "clothingId">;
