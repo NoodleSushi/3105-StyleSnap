@@ -1,6 +1,7 @@
 import { body, param } from "express-validator"
 
 export const wardrobeValidator = () => body("name")
+  .trim()
   .notEmpty()
   .withMessage("Name is required.").bail()
   .isString()

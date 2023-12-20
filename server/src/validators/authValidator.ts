@@ -2,6 +2,7 @@ import { body, header } from "express-validator";
 import { isEmailTaken, isUsernameTaken } from "../controllers/db";
 
 const usernameValidator = (checkTaken: boolean = false) => body("username")
+  .trim()
   .notEmpty()
   .withMessage("Username is required.").bail()
   .isLength({ min: 6 })
@@ -17,6 +18,7 @@ const usernameValidator = (checkTaken: boolean = false) => body("username")
   })
 
 const emailValidator = (checkTaken: boolean = false) => body("email")
+  .trim()
   .notEmpty()
   .withMessage("Email is required.").bail()
   .isEmail()
@@ -30,6 +32,7 @@ const emailValidator = (checkTaken: boolean = false) => body("email")
   });
 
 const passwordValidator = () => body("password")
+  .trim()
   .notEmpty()
   .withMessage("Password is required.").bail()
   .isLength({ min: 8 })
