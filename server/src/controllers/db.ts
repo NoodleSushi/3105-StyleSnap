@@ -1,7 +1,7 @@
 import mysql, { ConnectionOptions, ResultSetHeader, RowDataPacket } from "mysql2";
 import dotenv from "dotenv";
 import SQL from "sql-template-strings";
-import { User, Wardrobe, WardrobeInput } from "../interfaces";
+import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, UserAuthUserInput, Wardrobe, WardrobeUserInput, WardrobeInput } from "../interfaces";
 
 dotenv.config();
 
@@ -25,9 +25,9 @@ export const createMultilineConnection = (addDatabaseName: boolean) => {
 const db = mysql.createPool({...DB_OPTIONS, database: DB_DATABASE});
 
 
-export const createUser = async (username: string, email: string, password: string): Promise<void> => {
+export const createUser = async (newUser: UserAuthInput): Promise<void> => {
   try {
-    const query = SQL`INSERT INTO User (username, email, password) VALUES (${username}, ${email}, ${password})`;
+    const query = SQL`INSERT INTO User (username, email, password, is_admin) VALUES (${newUser.username}, ${newUser.email}, ${newUser.password}, ${newUser.is_admin})`;
     await db.promise().query(query);
   } catch (error) {
     throw error;
@@ -35,13 +35,9 @@ export const createUser = async (username: string, email: string, password: stri
 }
 
 export const isUsernameTaken = async (username: string): Promise<boolean> => {
-  interface Result extends RowDataPacket {
-    isTaken: number;
-  }
-
   try {
     const query = SQL`SELECT EXISTS (SELECT * FROM User WHERE username = ${username}) AS isTaken`;
-    const [result] = await db.promise().query<Result[]>(query);
+    const [result] = await db.promise().query<RowDataPacket[]>(query);
     const row = result && result[0];
     return row && row.isTaken == 1 || false;
   } catch (error) {
@@ -50,13 +46,9 @@ export const isUsernameTaken = async (username: string): Promise<boolean> => {
 }
 
 export const isEmailTaken = async (email: string): Promise<boolean> => {
-  interface Result extends RowDataPacket {
-    isTaken: number;
-  }
-
   try {
     const query = SQL`SELECT EXISTS (SELECT * FROM User WHERE email = ${email}) AS isTaken`;
-    const [result] = await db.promise().query<Result[]>(query);
+    const [result] = await db.promise().query<RowDataPacket[]>(query);
     const row = result && result[0];
     return row && row.isTaken == 1 || false;
   } catch (error) {
@@ -81,9 +73,9 @@ export const getUser = async (username: string, email: string): Promise<User | n
   }
 }
 
-export const createWardrobe = async (user_id: number, name: string): Promise<number> => {
+export const createWardrobe = async (wardrobe: WardrobeInput): Promise<number> => {
   try {
-    const query = SQL`INSERT INTO Wardrobe (owner, name) VALUES (${user_id}, ${name})`;
+    const query = SQL`INSERT INTO Wardrobe (owner, name) VALUES (${wardrobe.owner}, ${wardrobe.name})`;
     const [result] = await db.promise().query<ResultSetHeader>(query);
     const { insertId } = result;
     return insertId;
@@ -136,7 +128,7 @@ export const getAllWardrobes = async (): Promise<Wardrobe[]> => {
 
 }
 
-export const updateWardrobe = async (wardrobe_id: number, input: WardrobeInput): Promise<boolean> => {
+export const updateWardrobe = async (wardrobe_id: number, input: WardrobeUserInput): Promise<boolean> => {
   try {
     const query = SQL`UPDATE Wardrobe SET name = ${input.name} WHERE wardrobe_id = ${wardrobe_id}`;
     const [result] = await db.promise().query<ResultSetHeader>(query);

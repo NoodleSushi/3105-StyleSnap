@@ -1,9 +1,9 @@
 import { Request, RequestHandler } from "express";
 import { validationResult } from "express-validator";
-import { createUser, getUser } from "./db";
+import * as db from "./db";
 import { hashPassword, comparePassword, createAccessToken, userInfoResult } from "./authUtils";
-import { User, UserAuth, UserInfo } from "../interfaces";
-import { statusServerError, statusSuccessful, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError } from "./responseGenerators";
+import { User, UserAuthInput, UserAuthUserInput, UserInfo } from "../interfaces";
+import { statusServerError, statusSuccessOK, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError, statusSuccessCreated } from "./responseGenerators";
 import jwt from "jsonwebtoken";
 
 export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "user") => async (req: Request, res, next) => {
@@ -26,10 +26,15 @@ export const createUserAccount: RequestHandler = async (req, res) => {
     return statusValidErr;
 
   try {
-    const user: User = req.body;
-    const hashedPassword = await hashPassword(user.password);
-    await createUser(user.username, user.email, hashedPassword);
-    return statusSuccessful(res, 201, "User registration successful.");
+    const body = req.body as UserAuthUserInput
+    const hashedPassword = await hashPassword(body.password);
+    const user: UserAuthInput = {
+      ...body,
+      password: hashedPassword,
+      is_admin: false,
+    };
+    await db.createUser(user);
+    return statusSuccessCreated(res, "User registration successful.");
   } catch (err) {
     return statusServerError(res, err);
   }
@@ -43,8 +48,8 @@ export const loginUser: RequestHandler = async (req, res) => {
     return failResGen();
 
   try {
-    const userAuth: UserAuth = req.body;
-    const userRow = await getUser(userAuth.username, userAuth.email);
+    const userAuth: UserAuthUserInput = req.body;
+    const userRow = await db.getUser(userAuth.username, userAuth.email);
     if (!userRow)
       return failResGen();
     
@@ -59,7 +64,9 @@ export const loginUser: RequestHandler = async (req, res) => {
       is_admin: userRow.is_admin,
     });
 
-    return statusSuccessful(res, 200, "User login successful.", { accessToken });
+    return statusSuccessOK(res, "User login successful.",
+      { accessToken }
+    );
   } catch (err) {
     return statusServerError(res, err);
   }
