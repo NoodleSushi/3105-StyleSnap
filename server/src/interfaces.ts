@@ -1,9 +1,9 @@
 export interface User {
-  user_id: number;
+  userId: number;
   username: string;
   email: string;
   password: string;
-  is_admin: boolean;
+  isAdmin: boolean;
 }
 
 export type UserAuthUserInput = Omit<User, "user_id" | "is_admin">;
@@ -11,7 +11,7 @@ export type UserAuthInput = Omit<User, "user_id">;
 export type UserInfo = Omit<User, "password">;
 
 export interface Wardrobe {
-  wardrobe_id: number;
+  wardrobeId: number;
   owner: number;
   name: string;
 }

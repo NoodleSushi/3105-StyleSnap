@@ -16,7 +16,7 @@ export const createWardrobe: RequestHandler = async (req, res) => {
     const body: WardrobeUserInput = req.body;
     const wardrobe: WardrobeInput = {
       ...body,
-      owner: user.user_id,
+      owner: user.userId,
     }
     const wardrobe_id = await db.createWardrobe(wardrobe);
     return statusSuccessCreated(res,
@@ -48,8 +48,8 @@ export const getWardrobes: (mode: "user" | "admin" | "param") => RequestHandler 
       );
     }
     
-    const user_id = mode === "param" && Number(req.params.userId) || user.user_id;
-    if (user_id !== user.user_id && !user.is_admin)
+    const user_id = mode === "param" && Number(req.params.userId) || user.userId;
+    if (user_id !== user.userId && !user.isAdmin)
       return statusClientForbiddenError(res,
         "You do not have permission to view this user's wardrobes."
       );
@@ -79,7 +79,7 @@ export const getWardrobe: RequestHandler = async (req, res) => {
     if (!wardrobe)
       return statusClientNotFoundError(res, "Wardrobe not found.");
     
-    if (wardrobe.owner !== user.user_id && !user.is_admin)
+    if (wardrobe.owner !== user.userId && !user.isAdmin)
       return statusClientForbiddenError(res,
         "You do not have permission to view this wardrobe."
       );
@@ -109,7 +109,7 @@ export const updateWardrobe: RequestHandler = async (req, res) => {
     if (!wardrobe)
       return statusClientNotFoundError(res, "Wardrobe not found.");
 
-    if (wardrobe.owner !== user.user_id && !user.is_admin)
+    if (wardrobe.owner !== user.userId && !user.isAdmin)
       return statusClientForbiddenError(res,
         "You do not have permission to update this wardrobe."
       );
@@ -139,7 +139,7 @@ export const deleteWardrobe: RequestHandler = async (req, res) => {
     if (!wardrobe)
       return statusClientNotFoundError(res, "Wardrobe not found.");
 
-    if (wardrobe.owner !== user.user_id && !user.is_admin)
+    if (wardrobe.owner !== user.userId && !user.isAdmin)
       return statusClientForbiddenError(res,
         "You do not have permission to delete this wardrobe."
       );

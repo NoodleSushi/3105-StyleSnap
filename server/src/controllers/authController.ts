@@ -11,7 +11,7 @@ export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "
     const authorization = req.headers.authorization || "";
     const accessToken = authorization.match(/^Bearer (\S+)/)![1];
     const user = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!) as UserInfo;
-    if (mode === "admin" && !user.is_admin)
+    if (mode === "admin" && !user.isAdmin)
       return statusClientForbiddenError(res);
     (req as any).user = user;
   } catch (err) {
@@ -31,7 +31,7 @@ export const createUserAccount: RequestHandler = async (req, res) => {
     const user: UserAuthInput = {
       ...body,
       password: hashedPassword,
-      is_admin: false,
+      isAdmin: false,
     };
     await db.createUser(user);
     return statusSuccessCreated(res, "User registration successful.");
@@ -58,10 +58,10 @@ export const loginUser: RequestHandler = async (req, res) => {
       return failResGen();
 
     const accessToken = createAccessToken({
-      user_id: userRow.user_id,
+      userId: userRow.userId,
       username: userRow.username,
       email: userRow.email,
-      is_admin: userRow.is_admin,
+      isAdmin: userRow.isAdmin,
     });
 
     return statusSuccessOK(res, "User login successful.",
