@@ -4,6 +4,7 @@ import ClothingItem from '../components/ClothingItem';
 import styled from 'styled-components';
 import Footer from '../components/Footer';
 import UploadItem from '../components/UploadItem';
+import AddWardrobe from '../components/AddWardrobe';
 
 const PageContainer = styled.div`
   display: flex;
@@ -132,6 +133,7 @@ const CreateWardrobe: React.FC = () => {
             <option value="wardrobe1">Wardrobe 1</option>
             <option value="wardrobe2">Wardrobe 2</option>
           </Dropdown>
+         <AddWardrobe onClick={() => console.log('Add Wardrobe clicked')} />
         </LeftColumn>
 
         <RightColumn>

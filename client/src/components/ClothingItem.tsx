@@ -70,22 +70,22 @@ interface ClothingItemProps {
   onRemove: () => void;
   onDelete: () => void; 
   showRemoveButton: boolean;
-  createWardrobeContext?: boolean; // Corrected prop name for context
+  createWardrobeContext?: boolean; 
 }
 
 const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick, onRemove, onDelete, showRemoveButton, createWardrobeContext }) => {
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent the click event from reaching the parent container
+    e.stopPropagation(); 
     onClick();
   };
 
   const handleRemoveClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent the click event from reaching the parent container
+    e.stopPropagation(); 
     onRemove();
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent the click event from reaching the parent container
+    e.stopPropagation(); 
     onDelete();
   };
 
