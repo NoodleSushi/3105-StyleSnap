@@ -2,17 +2,20 @@ import React, { useState } from 'react';
 import Navbar from '../components/TopNav';
 import ClothingItem from '../components/ClothingItem';
 import styled from 'styled-components';
+import Footer from '../components/Footer';
+import UploadItem from '../components/UploadItem';
 
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
 `;
 
 const ContentContainer = styled.div`
   display: flex;
   max-width: 100%;
   flex: 1;
+  overflow-y: auto;
 `;
 
 const LeftColumn = styled.div`
@@ -113,6 +116,11 @@ const CreateWardrobe: React.FC = () => {
     console.log(`Remove ${card}`);
   };
 
+  const handleDeleteClick = () => {
+    // Logic for ClothingItem deletion from the database
+    console.log('Delete button clicked');
+  };
+
   return (
     <PageContainer>
       <Navbar />
@@ -146,16 +154,22 @@ const CreateWardrobe: React.FC = () => {
                         itemName={card}
                         onClick={() => handleCardClick(card)}
                         onRemove={() => handleRemoveCard(card)}
+                        onDelete={() => handleDeleteClick()}
                         showRemoveButton={false}
+                        createWardrobeContext={true}
                       />
                     ))}
                   </RowContainer>
                 </CollapsibleContent>
               </div>
             ))}
+
+            <UploadItem onClick={() => console.log('Upload button clicked')} />
+
           </VerticalMenu>
         </RightColumn>
       </ContentContainer>
+      <Footer />
     </PageContainer>
   );
 };

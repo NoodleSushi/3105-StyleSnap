@@ -14,6 +14,7 @@ const fadeIn = keyframes`
 `;
 
 const ClothingItemContainer = styled.div`
+  position: relative; /* Change to relative positioning */
   border: 1px solid #ddd;
   align-items: center;
   border-radius: 8px;
@@ -27,7 +28,7 @@ const ClothingItemContainer = styled.div`
   flex-direction: column;
   justify-content: space-between;
   animation: ${fadeIn} 0.5s ease; // Add animation property
-`;
+`
 
 const Image = styled.img`
   max-width: 100%;
@@ -45,15 +46,34 @@ const RemoveButton = styled.button<{ showRemoveButton: boolean }>`
   display: ${({ showRemoveButton }) => (showRemoveButton ? 'block' : 'none')};
 `;
 
+const DeleteButton = styled.button`
+  background-color: #a4a4a4;
+  color: #ffff;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  cursor: pointer;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+
+  &:hover {
+    background-color: rgba(108, 94, 94, 0.8);
+  }
+
+`;
+
 interface ClothingItemProps {
   imageUrl: string;
   itemName: string;
   onClick: () => void;
   onRemove: () => void;
+  onDelete: () => void; 
   showRemoveButton: boolean;
+  createWardrobeContext?: boolean; // Corrected prop name for context
 }
 
-const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick, onRemove, showRemoveButton }) => {
+const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick, onRemove, onDelete, showRemoveButton, createWardrobeContext }) => {
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent the click event from reaching the parent container
     onClick();
@@ -64,8 +84,14 @@ const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick
     onRemove();
   };
 
+  const handleDeleteClick = (e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent the click event from reaching the parent container
+    onDelete();
+  };
+
   return (
     <ClothingItemContainer onClick={handleClick}>
+      {createWardrobeContext && <DeleteButton onClick={handleDeleteClick}>x</DeleteButton>}
       <Image src={imageUrl} alt={itemName} />
       <RemoveButton showRemoveButton={showRemoveButton} onClick={handleRemoveClick}>
         Remove
@@ -75,4 +101,3 @@ const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick
 };
 
 export default ClothingItem;
-

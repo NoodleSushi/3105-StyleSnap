@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Outfit from '../components/Outfit';
 import SaveButton from '../components/SaveOutfit';
 import ShimmerEffect from '../components/ShimmerEffect';
+import Footer from '../components/Footer';
 
 const PageContainer = styled.div`
   display: flex;
@@ -134,6 +135,11 @@ const CreateOutfit: React.FC = () => {
     setSelectedCards((prevSelectedCards) => prevSelectedCards.filter((selectedCard) => selectedCard !== card));
   };
 
+  const handleDeleteClick = () => {
+    // Logic for ClothingItem deletion from the database
+    console.log('Delete button clicked');
+  };
+
   return (
     <PageContainer>
       <Navbar />
@@ -168,6 +174,7 @@ const CreateOutfit: React.FC = () => {
                         itemName={card}
                         onClick={() => handleCardClick(card)}
                         onRemove={() => handleRemoveCard(card)}
+                        onDelete={() => handleDeleteClick()}
                         showRemoveButton={false}
                       />
                     ))}
@@ -196,6 +203,7 @@ const CreateOutfit: React.FC = () => {
         </RightColumn>
       </ContentContainer>
       )}
+    <Footer />
     </PageContainer>
   );
 };
