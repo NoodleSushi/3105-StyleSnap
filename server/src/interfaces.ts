@@ -1,18 +1,41 @@
 export interface User {
-  user_id: number;
+  userId: number;
   username: string;
   email: string;
   password: string;
-  is_admin: boolean;
+  isAdmin: boolean;
 }
 
-export type UserAuth = Omit<User, "user_id" | "is_admin">;
+export type UserAuthUserInput = Omit<User, "userId" | "isAdmin">;
+export type UserAuthInput = Omit<User, "userId">;
 export type UserInfo = Omit<User, "password">;
 
 export interface Wardrobe {
-  wardrobe_id: number;
+  wardrobeId: number;
   owner: number;
   name: string;
 }
 
-export type WardrobeInput = Omit<Wardrobe, "wardrobe_id" | "owner">;
+export type WardrobeUserInput = Omit<Wardrobe, "wardrobeId" | "owner">;
+export type WardrobeInput = Omit<Wardrobe, "wardrobeId">;
+
+export interface ClothingCategory {
+  clothingCatId: number;
+  name: string;
+}
+
+export interface ClothingType {
+  clothingTypeId: number;
+  clothingCatId: number;
+  name: string;
+}
+
+export interface Clothing {
+  clothingId: number;
+  wardrobeId: number;
+  clothingTypeId: number;
+  name: string;
+  image: string;
+}
+
+export type ClothingInput = Omit<Clothing, "clothingId">;

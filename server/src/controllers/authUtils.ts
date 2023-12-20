@@ -15,10 +15,10 @@ export const comparePassword = async (password: string, hashedPassword: string):
 export const createAccessToken = (user: UserInfo): string => {
   const accessToken = jwt.sign(
     {
-      user_id: user.user_id,
+      userId: user.userId,
       username: user.username,
       email: user.email,
-      is_admin: user.is_admin,
+      isAdmin: user.isAdmin,
     },
     process.env.ACCESS_TOKEN_SCERET!,
   );

@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
-import { statusServerError, statusSuccessful, statusValidationError, statusClientNotFoundError, statusClientUnauthorizedError } from "./utils";
-import { WardrobeInput } from "../interfaces";
+import { statusServerError, statusSuccessOK, statusValidationError, statusClientNotFoundError, statusClientForbiddenError, statusSuccessCreated } from "./responseGenerators";
+import { WardrobeInput, WardrobeUserInput } from "../interfaces";
 import { userInfoResult } from "./authUtils";
 import * as db from "./db";
 
@@ -10,15 +10,21 @@ export const createWardrobe: RequestHandler = async (req, res) => {
     return statusValidErr;
 
   try {
-    const wardrobe: WardrobeInput = req.body;
     const user = userInfoResult(req);
     if (!user)
       return statusServerError(res);
-    const user_id = user.user_id;
-    const wardrobe_id = await db.createWardrobe(user_id, wardrobe.name);
-    return statusSuccessful(res, 201, "Wardrobe creation successful.", { wardrobe_id });
+    const body: WardrobeUserInput = req.body;
+    const wardrobe: WardrobeInput = {
+      ...body,
+      owner: user.userId,
+    }
+    const wardrobe_id = await db.createWardrobe(wardrobe);
+    return statusSuccessCreated(res,
+      "Wardrobe creation successful.",
+      { wardrobeId: wardrobe_id }
+    );
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -36,14 +42,25 @@ export const getWardrobes: (mode: "user" | "admin" | "param") => RequestHandler 
     
     if (mode === "admin") {
       const wardrobes = await db.getAllWardrobes();
-      return statusSuccessful(res, 200, "All wardrobes retrieval successful.", { wardrobes });
+      return statusSuccessOK(res,
+        "All wardrobes retrieval successful.",
+        { wardrobes }
+      );
     }
     
-    const user_id = mode === "param" && Number(req.params.userId) || user.user_id;
+    const user_id = mode === "param" && Number(req.params.userId) || user.userId;
+    if (user_id !== user.userId && !user.isAdmin)
+      return statusClientForbiddenError(res,
+        "You do not have permission to view this user's wardrobes."
+      );
+
     const wardrobes = await db.getUserWardrobes(user_id);
-    return statusSuccessful(res, 200, "User wardrobes retrieval successful.", { wardrobes });
+    return statusSuccessOK(res,
+      "User wardrobes retrieval successful.",
+      { wardrobes }
+    );
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -62,12 +79,17 @@ export const getWardrobe: RequestHandler = async (req, res) => {
     if (!wardrobe)
       return statusClientNotFoundError(res, "Wardrobe not found.");
     
-    if (wardrobe.owner !== user.user_id && !user.is_admin)
-      return statusClientUnauthorizedError(res);
+    if (wardrobe.owner !== user.userId && !user.isAdmin)
+      return statusClientForbiddenError(res,
+        "You do not have permission to view this wardrobe."
+      );
     
-    return statusSuccessful(res, 200, "Wardrobe retrieval successful.", { wardrobe });
+    return statusSuccessOK(res,
+      "Wardrobe retrieval successful.",
+      { wardrobe }
+    );
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -87,16 +109,18 @@ export const updateWardrobe: RequestHandler = async (req, res) => {
     if (!wardrobe)
       return statusClientNotFoundError(res, "Wardrobe not found.");
 
-    if (wardrobe.owner !== user.user_id && !user.is_admin)
-      return statusClientUnauthorizedError(res);
+    if (wardrobe.owner !== user.userId && !user.isAdmin)
+      return statusClientForbiddenError(res,
+        "You do not have permission to update this wardrobe."
+      );
 
     const isUpdated = await db.updateWardrobe(wardrobe_id, wardrobe_input);
     if (!isUpdated)
       return statusServerError(res);
 
-    return statusSuccessful(res, 200, "Wardrobe update successful.");
+    return statusSuccessOK(res, "Wardrobe update successful.");
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -115,12 +139,14 @@ export const deleteWardrobe: RequestHandler = async (req, res) => {
     if (!wardrobe)
       return statusClientNotFoundError(res, "Wardrobe not found.");
 
-    if (wardrobe.owner !== user.user_id && !user.is_admin)
-      return statusClientUnauthorizedError(res);
+    if (wardrobe.owner !== user.userId && !user.isAdmin)
+      return statusClientForbiddenError(res,
+        "You do not have permission to delete this wardrobe."
+      );
 
     await db.deleteWardrobe(wardrobe_id);
-    return statusSuccessful(res, 200, "Wardrobe deletion successful.");
+    return statusSuccessOK(res, "Wardrobe deletion successful.");
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }

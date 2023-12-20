@@ -28,6 +28,9 @@ app.use(express.json());
 
 app.use(routes);
 
+// setup static files
+app.use('/public', express.static('public'));
+
 app.listen(SERVER_PORT, () => {
   console.log(`Server listening on port ${SERVER_PORT}`);
 });

@@ -1,9 +1,9 @@
 import { Request, RequestHandler } from "express";
 import { validationResult } from "express-validator";
-import { createUser, getUser } from "./db";
+import * as db from "./db";
 import { hashPassword, comparePassword, createAccessToken, userInfoResult } from "./authUtils";
-import { User, UserAuth, UserInfo } from "../interfaces";
-import { statusServerError, statusSuccessful, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError } from "./utils";
+import { User, UserAuthInput, UserAuthUserInput, UserInfo } from "../interfaces";
+import { statusServerError, statusSuccessOK, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError, statusSuccessCreated } from "./responseGenerators";
 import jwt from "jsonwebtoken";
 
 export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "user") => async (req: Request, res, next) => {
@@ -11,7 +11,7 @@ export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "
     const authorization = req.headers.authorization || "";
     const accessToken = authorization.match(/^Bearer (\S+)/)![1];
     const user = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!) as UserInfo;
-    if (mode === "admin" && !user.is_admin)
+    if (mode === "admin" && !user.isAdmin)
       return statusClientForbiddenError(res);
     (req as any).user = user;
   } catch (err) {
@@ -26,12 +26,17 @@ export const createUserAccount: RequestHandler = async (req, res) => {
     return statusValidErr;
 
   try {
-    const user: User = req.body;
-    const hashedPassword = await hashPassword(user.password);
-    await createUser(user.username, user.email, hashedPassword);
-    return statusSuccessful(res, 201, "User registration successful.");
+    const body = req.body as UserAuthUserInput
+    const hashedPassword = await hashPassword(body.password);
+    const user: UserAuthInput = {
+      ...body,
+      password: hashedPassword,
+      isAdmin: false,
+    };
+    await db.createUser(user);
+    return statusSuccessCreated(res, "User registration successful.");
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
 }
 
@@ -43,8 +48,8 @@ export const loginUser: RequestHandler = async (req, res) => {
     return failResGen();
 
   try {
-    const userAuth: UserAuth = req.body;
-    const userRow = await getUser(userAuth.username, userAuth.email);
+    const userAuth: UserAuthUserInput = req.body;
+    const userRow = await db.getUser(userAuth.username, userAuth.email);
     if (!userRow)
       return failResGen();
     
@@ -53,27 +58,16 @@ export const loginUser: RequestHandler = async (req, res) => {
       return failResGen();
 
     const accessToken = createAccessToken({
-      user_id: userRow.user_id,
+      userId: userRow.userId,
       username: userRow.username,
       email: userRow.email,
-      is_admin: userRow.is_admin,
+      isAdmin: userRow.isAdmin,
     });
 
-    return statusSuccessful(res, 200, "User login successful.", { accessToken });
+    return statusSuccessOK(res, "User login successful.",
+      { accessToken }
+    );
   } catch (err) {
-    return statusServerError(res);
+    return statusServerError(res, err);
   }
-}
-
-export const authTest: RequestHandler = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(401).json({
-      message: errors.array()[0].msg,
-    });
-  }
-  res.json({
-    message: "You have a valid access token.",
-    user: userInfoResult(req),
-  });
 }
