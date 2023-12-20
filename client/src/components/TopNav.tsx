@@ -203,7 +203,6 @@ const TopNav: React.FC = () => {
               </CreateNewContent>
             </CreateNewContainer>
             <NavLink to="/my-outfits">My Outfits</NavLink>
-            <NavLink to="/upload-items">Upload Items</NavLink>
             <DropdownContainer>
               <DropdownButton onClick={toggleDropdown}>Username</DropdownButton>
               <DropdownContent isOpen={isDropdownOpen}>

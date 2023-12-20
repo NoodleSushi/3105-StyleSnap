@@ -1,7 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Navbar from '../components/TopNav';
 import ClothingItem from '../components/ClothingItem'; // Import the ClothingItem component
 import styled from 'styled-components';
+import Outfit from '../components/Outfit';
+import SaveButton from '../components/SaveOutfit';
+import ShimmerEffect from '../components/ShimmerEffect';
+import Footer from '../components/Footer';
 
 const PageContainer = styled.div`
   display: flex;
@@ -11,21 +15,26 @@ const PageContainer = styled.div`
 
 const ContentContainer = styled.div`
   display: flex;
+  max-width: 100%;
   flex: 1;
 `;
 
 const LeftColumn = styled.div`
-  width: 200px;
-  padding: 20px;
+  width: 33.3%;
+  padding: 2rem;
 `;
 
-const LargeCard = styled.div`
+const RightColumn = styled.div`
   flex: 1;
-  border: 2px dashed #aaa;
-  margin: 0 20px;
-  padding: 20px;
-  overflow: auto;
+  padding: 2rem;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
 `;
+
 
 const Dropdown = styled.select`
   margin-bottom: 10px;
@@ -43,7 +52,13 @@ const MenuItem = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;  // Add this line to align content horizontally
+
+  &:hover {
+    background-color: #A4A4A4;  // Change to the desired hover background color
+    border-radius: 0.2rem;
+  }
 `;
+
 
 const MenuArrow = styled.div<{ isOpen: boolean }>`
   margin-left: auto;
@@ -61,6 +76,7 @@ const RowContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  width: 100%;
 `;
 
 const CreateOutfit: React.FC = () => {
@@ -74,7 +90,19 @@ const CreateOutfit: React.FC = () => {
     { category: 'Shoes', isOpen: false, cards: ['Card 11', 'Card 12'] },
   ]);
   const [selectedCards, setSelectedCards] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true); // New state for loading
 
+  useEffect(() => {
+    // Simulate an asynchronous operation (e.g., fetching data)
+    const fetchData = async () => {
+      // Simulate a delay (you can replace this with actual data fetching)
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      setIsLoading(false); // Set loading to false once data is fetched
+    };
+
+    fetchData();
+  }, []);
+  
   const handleWardrobeChange = (value: string) => {
     setSelectedWardrobe(value);
   };
@@ -107,9 +135,18 @@ const CreateOutfit: React.FC = () => {
     setSelectedCards((prevSelectedCards) => prevSelectedCards.filter((selectedCard) => selectedCard !== card));
   };
 
+  const handleDeleteClick = () => {
+    // Logic for ClothingItem deletion from the database
+    console.log('Delete button clicked');
+  };
+
   return (
     <PageContainer>
       <Navbar />
+
+      { isLoading ? (
+        <ShimmerEffect style={{ flex: 1, padding: '2rem' }} />
+      ) : (
       <ContentContainer>
         <LeftColumn>
           <Dropdown onChange={(e) => handleWardrobeChange(e.target.value)}>
@@ -121,10 +158,12 @@ const CreateOutfit: React.FC = () => {
           <VerticalMenu>
             {menuItems.map((item, index) => (
               <div key={index}>
+
                 <MenuItem onClick={() => toggleMenu(index)}>
                   {item.category}
                   <MenuArrow isOpen={item.isOpen}>▶</MenuArrow>
                 </MenuItem>
+
                 <CollapsibleContent isOpen={item.isOpen}>
                   {/* Render ClothingItem components for this category in rows */}
                   <RowContainer>
@@ -135,29 +174,36 @@ const CreateOutfit: React.FC = () => {
                         itemName={card}
                         onClick={() => handleCardClick(card)}
                         onRemove={() => handleRemoveCard(card)}
+                        onDelete={() => handleDeleteClick()}
                         showRemoveButton={false}
                       />
                     ))}
                   </RowContainer>
                 </CollapsibleContent>
+
               </div>
             ))}
           </VerticalMenu>
         </LeftColumn>
+                      
+        <RightColumn>
+          {/* Create Your Outfit */}
+          <div>
+            <p>Create Your Outfit</p>
 
-        <LargeCard>
-          {selectedCards.map((selectedCard, index) => (
-            <ClothingItem
-              key={selectedCard}
-              imageUrl ={`your_image_url_${index + 1}.jpg`}
-              itemName={selectedCard}
-              onClick={() => handleCardClick(selectedCard)}
-              onRemove={() => handleRemoveCard(selectedCard)}
-              showRemoveButton={true} // Corrected syntax
+            <Outfit
+              selectedCards={selectedCards}
+              handleCardClick={handleCardClick}
+              handleRemoveCard={handleRemoveCard}
             />
-          ))}
-        </LargeCard>
+          </div>
+
+  
+          <SaveButton onClick={() => console.log('Save button clicked')} />
+        </RightColumn>
       </ContentContainer>
+      )}
+    <Footer />
     </PageContainer>
   );
 };

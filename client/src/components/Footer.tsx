@@ -6,6 +6,7 @@ const FooterContainer = styled.footer`
   width: 100%;
   padding: 20px 0;
   text-align: center;
+  position: relative;
 `;
 
 const LinkContainer = styled.div`

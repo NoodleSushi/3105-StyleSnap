@@ -6,7 +6,6 @@ import Dashboard from './pages/Dashboard';
 import CreateOutfit from './pages/CreateOutfit';
 import CreateWardrobe from './pages/CreateWardrobe';
 import MyOutfits from './pages/MyOutfts';
-import UploadItems from './pages/UploadItems';
 
 const App: React.FC = () => {
   return (
@@ -17,7 +16,6 @@ const App: React.FC = () => {
         <Route path="/create-outfit" element={<CreateOutfit />} />
         <Route path="/create-wardrobe" element={<CreateWardrobe />} />
         <Route path="/my-outfits" element={<MyOutfits />} />
-        <Route path="/upload-items" element={<UploadItems />} />
       </Routes>
       <GlobalStyles />
     </Router>
