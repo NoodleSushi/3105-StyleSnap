@@ -71,16 +71,3 @@ export const loginUser: RequestHandler = async (req, res) => {
     return statusServerError(res, err);
   }
 }
-
-export const authTest: RequestHandler = (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(401).json({
-      message: errors.array()[0].msg,
-    });
-  }
-  res.json({
-    message: "You have a valid access token.",
-    user: userInfoResult(req),
-  });
-}

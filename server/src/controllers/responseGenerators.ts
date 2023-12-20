@@ -42,6 +42,10 @@ export const statusServerError = (res: Response, err?: any): Response => {
   return baseStatusGen(res, 500, "Internal server error.");
 }
 
+export const statusClientBadRequestError = (res: Response, msg?: string): Response => {
+  return baseStatusGen(res, 400, msg || "Bad request.");
+}
+
 export const statusClientUnauthorizedError = (res: Response, msg?: string): Response => {
   return baseStatusGen(res, 401, msg || "Unauthorized.");
 }

@@ -7,7 +7,7 @@ import { userIdParamValidator } from "../validators/generalValidator";
 
 const wardrobeRoutes = Router();
 
-wardrobeRoutes.post('/wardrobes', authTokenValidator(), attachUser(), wardrobeValidator(), createWardrobe);
+wardrobeRoutes.post('/user/wardrobes', authTokenValidator(), attachUser(), wardrobeValidator(), createWardrobe);
 wardrobeRoutes.get('/wardrobes', authTokenValidator(), attachUser("admin"), getWardrobes("admin"));
 wardrobeRoutes.get('/wardrobes/:wardrobeId', authTokenValidator(), attachUser(), wardrobeIdParamValidator(), getWardrobe);
 wardrobeRoutes.put('/wardrobes/:wardrobeId', authTokenValidator(), attachUser(), wardrobeIdParamValidator(), wardrobeValidator(), updateWardrobe);

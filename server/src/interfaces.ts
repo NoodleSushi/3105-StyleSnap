@@ -6,8 +6,8 @@ export interface User {
   isAdmin: boolean;
 }
 
-export type UserAuthUserInput = Omit<User, "user_id" | "is_admin">;
-export type UserAuthInput = Omit<User, "user_id">;
+export type UserAuthUserInput = Omit<User, "userId" | "isAdmin">;
+export type UserAuthInput = Omit<User, "userId">;
 export type UserInfo = Omit<User, "password">;
 
 export interface Wardrobe {
@@ -16,5 +16,5 @@ export interface Wardrobe {
   name: string;
 }
 
-export type WardrobeUserInput = Omit<Wardrobe, "wardrobe_id" | "owner">;
-export type WardrobeInput = Omit<Wardrobe, "wardrobe_id">;
+export type WardrobeUserInput = Omit<Wardrobe, "wardrobeId" | "owner">;
+export type WardrobeInput = Omit<Wardrobe, "wardrobeId">;
