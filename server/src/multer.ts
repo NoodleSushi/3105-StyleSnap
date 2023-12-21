@@ -6,7 +6,7 @@ import { Request } from 'express';
 
 const uploadDirectory = 'public/uploads/';
 
-export const storage = multer.diskStorage({
+const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     if (!fs.existsSync(uploadDirectory)) {
       fs.mkdirSync(uploadDirectory, { recursive: true });
