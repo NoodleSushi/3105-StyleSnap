@@ -1,6 +1,6 @@
 import { RequestHandler } from 'express';
 import { statusClientForbiddenError, statusClientNotFoundError, statusServerError, statusSuccessCreated, statusSuccessOK, statusValidationError } from './responseGenerators';
-import * as db from './db';
+import * as db from '../db';
 import { ClothingInput, ClothingUpdateInput } from '../interfaces';
 import { userInfoResult } from './authUtils';
 import { getImageUrl } from '../multer';

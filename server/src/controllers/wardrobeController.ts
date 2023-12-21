@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import { statusServerError, statusSuccessOK, statusValidationError, statusClientNotFoundError, statusClientForbiddenError, statusSuccessCreated } from "./responseGenerators";
 import { WardrobeInput, WardrobeUserInput } from "../interfaces";
 import { userInfoResult } from "./authUtils";
-import * as db from "./db";
+import * as db from "../db";
 
 export const createWardrobe: RequestHandler = async (req, res) => {
   const statusValidErr = statusValidationError(req, res, "Invalid wardrobe data.", "batch");

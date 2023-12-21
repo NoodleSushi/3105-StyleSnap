@@ -1,7 +1,7 @@
 import mysql, { ConnectionOptions, ResultSetHeader, RowDataPacket } from "mysql2";
 import dotenv from "dotenv";
 import SQL from "sql-template-strings";
-import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, Wardrobe, WardrobeUserInput, WardrobeInput, Clothing, ClothingUpdateInput } from "../interfaces";
+import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, Wardrobe, WardrobeUserInput, WardrobeInput, Clothing, ClothingUpdateInput } from "./interfaces";
 
 dotenv.config();
 

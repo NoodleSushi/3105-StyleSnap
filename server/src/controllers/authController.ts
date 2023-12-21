@@ -1,6 +1,6 @@
 import { Request, RequestHandler } from "express";
 import { validationResult } from "express-validator";
-import * as db from "./db";
+import * as db from "../db";
 import { hashPassword, comparePassword, createAccessToken, verifyAccessToken } from "./authUtils";
 import { UserAuthInput, UserAuthUserInput } from "../interfaces";
 import { statusServerError, statusSuccessOK, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError, statusSuccessCreated } from "./responseGenerators";
