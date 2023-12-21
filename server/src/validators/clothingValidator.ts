@@ -17,7 +17,8 @@ export const clothingTypeIdValidator = () => body("clothingTypeId")
   .notEmpty()
   .withMessage("Clothing type ID is required.").bail()
   .isInt({ min: 1 })
-  .withMessage("Clothing type ID must be a positive integer.");
+  .withMessage("Clothing type ID must be a positive integer.")
+  .toInt();
 
 export const clothingCategoryIdParamValidator = () => param("clothingCategoryId")
   .notEmpty()
