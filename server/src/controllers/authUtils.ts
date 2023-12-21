@@ -25,6 +25,15 @@ export const createAccessToken = (user: UserInfo): string => {
   return accessToken;
 }
 
+export const verifyAccessToken = (accessToken: string): UserInfo | null => {
+  try {
+    const decodedToken = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!) as UserInfo;
+    return decodedToken;
+  } catch (error) {
+    return null;
+  }
+}
+
 export const userInfoResult = (req: { [k: string]: any }): UserInfo | null => {
   return req.user || null;
 }
