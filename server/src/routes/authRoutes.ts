@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { userAuthValidator, userLoginValidator, authTokenValidator } from "../validators/authValidator";
+import { userAuthValidator, userLoginValidator } from "../validators/authValidator";
 import { createUserAccount, loginUser } from "../controllers/authController";
 
 
