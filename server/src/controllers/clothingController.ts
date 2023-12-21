@@ -3,8 +3,7 @@ import { statusClientForbiddenError, statusClientNotFoundError, statusServerErro
 import * as db from './db';
 import { ClothingInput, ClothingUpdateInput } from '../interfaces';
 import { userInfoResult } from './authUtils';
-import { uploadDirectory } from '../routes/multer';
-import path from 'path';
+import { getImageUrl } from '../multer';
 
 export const getClothingTypeHierarchy : RequestHandler = async (req, res) => {
   try {
@@ -125,13 +124,6 @@ export const updateClothing: RequestHandler = async (req, res) => {
   } catch (err) {
     return statusServerError(res, err);
   }
-}
-
-
-export const getImageUrl = (req: { [k: string]: any }, filename: string): string => {
-  const url = new URL(`${req.protocol}://${req.get('host')}`);
-  url.pathname = path.join(url.pathname, uploadDirectory, filename);
-  return url.toString();
 }
 
 export const getClothing: RequestHandler = async (req, res) => {

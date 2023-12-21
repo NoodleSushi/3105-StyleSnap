@@ -4,7 +4,7 @@ import { attachUser } from "../controllers/authController";
 import { clothingCategoryIdParamValidator, clothingIdParamValidator, clothingTypeIdParamValidator, clothingUpdateValidator, clothingValidator } from "../validators/clothingValidator";
 import { validateMulterUpload } from "../validators/generalValidator";
 import { createClothing, deleteClothing, getClothing, getClothingByWardrobe, getClothingCategory, getClothingType, getClothingTypeHierarchy, updateClothing } from "../controllers/clothingController";
-import { upload } from "./multer";
+import { upload } from "../multer";
 import { wardrobeIdParamValidator } from "../validators/wardrobeValidator";
 
 const clothingRoutes = Router();

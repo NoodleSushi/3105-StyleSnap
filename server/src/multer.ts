@@ -2,8 +2,9 @@ import multer, { FileFilterCallback } from 'multer';
 import crypto from 'crypto';
 import fs from 'fs';
 import path from 'path';
+import { Request } from 'express';
 
-export const uploadDirectory = 'public/uploads/';
+const uploadDirectory = 'public/uploads/';
 
 export const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -30,5 +31,10 @@ const fileFilter = (req: Express.Request, file: Express.Multer.File, cb: FileFil
   }
 }
 
+export const getImageUrl = (req: Request, filename: string): string => {
+  const url = new URL(`${req.protocol}://${req.get('host')}`);
+  url.pathname = path.join(url.pathname, uploadDirectory, filename);
+  return url.toString();
+}
 
 export const upload = multer({ storage, fileFilter });
