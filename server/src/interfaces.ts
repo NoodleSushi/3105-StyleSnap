@@ -1,3 +1,5 @@
+type Optional<T, K extends keyof T> = Pick<Partial<T>, K> & Omit<T, K>;
+
 export interface User {
   userId: number;
   username: string;
@@ -39,3 +41,4 @@ export interface Clothing {
 }
 
 export type ClothingInput = Omit<Clothing, "clothingId">;
+export type ClothingUpdateInput = Optional<Omit<Clothing, "wardrobeId">, "clothingTypeId" | "name" | "image">;

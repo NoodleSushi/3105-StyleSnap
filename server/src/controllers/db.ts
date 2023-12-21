@@ -1,7 +1,7 @@
 import mysql, { ConnectionOptions, ResultSetHeader, RowDataPacket } from "mysql2";
 import dotenv from "dotenv";
 import SQL from "sql-template-strings";
-import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, Wardrobe, WardrobeUserInput, WardrobeInput, Clothing } from "../interfaces";
+import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, Wardrobe, WardrobeUserInput, WardrobeInput, Clothing, ClothingUpdateInput } from "../interfaces";
 
 dotenv.config();
 
@@ -205,6 +205,32 @@ export const createClothing = async (clothing: ClothingInput): Promise<number> =
     const [result] = await db.promise().query<ResultSetHeader>(query);
     const { insertId } = result;
     return insertId;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const updateClothing = async (clothing: ClothingUpdateInput): Promise<boolean> => {
+  try {
+    let table: Record<string, any> = {
+      clothing_type_id: clothing.clothingTypeId,
+      name: clothing.name,
+      image: clothing.image,
+    };
+    table = Object.fromEntries(Object.entries(table).filter(([_, value]) => value !== undefined));
+
+    const query = SQL`UPDATE Clothing SET `;
+    const entries = Object.entries(table);
+    for (let i = 0; i < entries.length; i++) {
+      const [key, value] = entries[i];
+      query.append(SQL``.append(mysql.escapeId(key)).append(SQL` = ${value}`));
+      if (i !== entries.length - 1) {
+        query.append(SQL`, `);
+      }
+    }
+    query.append(SQL` WHERE clothing_id = ${clothing.clothingId}`);
+    const [result] = await db.promise().query<ResultSetHeader>(query);
+    return result.affectedRows > 0;
   } catch (error) {
     throw error;
   }

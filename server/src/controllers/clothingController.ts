@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express';
 import { statusClientForbiddenError, statusClientNotFoundError, statusServerError, statusSuccessCreated, statusSuccessOK, statusValidationError } from './responseGenerators';
 import * as db from './db';
-import { ClothingInput } from '../interfaces';
+import { ClothingInput, ClothingUpdateInput } from '../interfaces';
 import { userInfoResult } from './authUtils';
 import { uploadDirectory } from '../routes/multer';
 import path from 'path';
@@ -91,6 +91,37 @@ export const createClothing: RequestHandler = async (req, res) => {
       "Clothing created.",
       { clothingId: clothing_id }
     );
+  } catch (err) {
+    return statusServerError(res, err);
+  }
+}
+
+export const updateClothing: RequestHandler = async (req, res) => {
+  const statusValidErr = statusValidationError(req, res);
+  if (statusValidErr)
+    return statusValidErr;
+
+  try {
+    const user = userInfoResult(req);
+    if (!user)
+      return statusServerError(res);
+  
+    const clothingId = Number(req.params.clothingId);
+    const clothing = await db.getClothing(clothingId);
+    if (!clothing)
+      return statusClientNotFoundError(res, "Clothing not found.");
+
+    const wardrobe = await db.getWardrobe(clothing.wardrobeId);
+    if (!wardrobe)
+      return statusClientNotFoundError(res, "Wardrobe not found.");
+    if (wardrobe.owner !== user.userId && !user.isAdmin)
+      return statusClientForbiddenError(res, "You do not have permission to update this clothing.");
+
+    const imageFilename = req.file && req.file.filename || undefined;
+
+    const clothingInput: ClothingUpdateInput = { ...req.body, clothingId, image: imageFilename };
+    await db.updateClothing(clothingInput);
+    return statusSuccessOK(res, "Clothing updated.");
   } catch (err) {
     return statusServerError(res, err);
   }
