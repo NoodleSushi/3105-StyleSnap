@@ -1,32 +1,49 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import ClothingItem from '../components/ClothingItem';
 
-const LargeCard = styled.div`
+interface LargeCardProps {
+  isCreateOutfitPage?: boolean;
+}
+
+const LargeCard = styled.div<LargeCardProps>`
   flex: 1;
   justify-content: space-around;
   border: 2px dashed #aaa;
   border-radius: 0.2rem;
   margin: 2rem;
-  padding: 2rem;
+  padding: 1rem;
   overflow: auto;
-  max-height: 60%;
+  max-height: 50%;
   max-width: 60%;
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.3rem;
   height: 30rem;
-  width: 45rem;  
+  width: 50rem;  
+  transition: transform 0.3s ease;
+
+  ///AHHHH I was trying to get this to not transform in create-outfit but wtv wtv
+  ${({ isCreateOutfitPage }) =>
+    !isCreateOutfitPage &&
+    css`
+      &:hover {
+        transform: scale(1.2);              
+      }
+    `}
 `;
 
 interface OutfitProps {
   selectedCards: string[];
   handleCardClick: (card: string) => void;
   handleRemoveCard: (card: string) => void;
+  showRemoveButton: boolean;
+  isMyOutfitsContext: boolean;
+  isCreateOutfitPage?: boolean;
 }
 
-const Outfit: React.FC<OutfitProps> = ({ selectedCards, handleCardClick, handleRemoveCard }) => (
-  <LargeCard>
+const Outfit: React.FC<OutfitProps> = ({ selectedCards, handleCardClick, handleRemoveCard, showRemoveButton, isCreateOutfitPage = false }) => (
+  <LargeCard isCreateOutfitPage={isCreateOutfitPage}>
     {selectedCards.map((selectedCard, index) => (
       <ClothingItem
         key={selectedCard}
@@ -34,7 +51,10 @@ const Outfit: React.FC<OutfitProps> = ({ selectedCards, handleCardClick, handleR
         itemName={selectedCard}
         onClick={() => handleCardClick(selectedCard)}
         onRemove={() => handleRemoveCard(selectedCard)}
-        showRemoveButton={true}
+        showRemoveButton={showRemoveButton}
+        onDelete={() => {
+          // Add onDelete logic here
+        }}
       />
     ))}
   </LargeCard>

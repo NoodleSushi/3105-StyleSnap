@@ -3,8 +3,24 @@ import styled from 'styled-components';
 
 const StyledWardrobeSelect = styled.select`
   margin-bottom: 10px;
-  width: 100%;
-  padding: 5px;
+  width: 60%;
+  padding: 0.5rem;
+  font-size: 16px; 
+  color: #333; 
+  background-color: #fff; 
+  border: 2px solid #ccc; 
+  border-radius: 0.3rem; 
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f0f0f0; 
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #007bff; 
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); 
+  }
 `;
 
 interface WardrobeSelectProps {

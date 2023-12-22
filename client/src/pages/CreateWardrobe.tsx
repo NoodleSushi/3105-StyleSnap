@@ -8,43 +8,34 @@ import AddWardrobe from '../components/AddWardrobe';
 import WardrobeSelect from '../components/WardrobeSelect';
 import ShimmerEffect from '../components/ShimmerEffect';
 
+
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 `;
-
 const ContentContainer = styled.div`
   display: flex;
   max-width: 100%;
   flex: 1;
   overflow-y: auto;
 `;
-
 const LeftColumn = styled.div`
-  width: 32%;
+  width: 30%;
   padding: 3rem;
 `;
-
 const RightColumn = styled.div`
   flex: 1;
   padding: 3rem;
-  height: 100vh;
+  height: 100%;
   display: flex;
-  flex-wrap: wrap; /* Allow flex items to wrap to the next row */
-  justify-content: space-between; /* Distribute items evenly along the row */
-  width: 100%; /* Adjusted width to take up half of the page */
+  flex-wrap: wrap; 
+  justify-content: space-between; 
+  width: 100%; 
 `;
-
 const WardrobeInfoContainer = styled.div`
   width: 100%; /* Ensure full width */
   margin-bottom: 20px; /* Add margin between the <p> and VerticalMenu */
-`;
-
-const Dropdown = styled.select`
-  margin-bottom: 10px;
-  width: 100%;
-  padding: 5px;
 `;
 
 const VerticalMenu = styled.div`
@@ -52,7 +43,6 @@ const VerticalMenu = styled.div`
   width: 80%;
   padding: 2rem;
 `;
-
 const MenuItem = styled.div`
   cursor: pointer;
   padding: 10px;
@@ -65,19 +55,16 @@ const MenuItem = styled.div`
     border-radius: 0.2rem;
   }
 `;
-
 const MenuArrow = styled.div<{ isOpen: boolean }>`
   margin-left: auto;
   transform: ${({ isOpen }) => (isOpen ? 'rotate(90deg)' : 'rotate(0deg)')};
   transition: transform 0.3s ease;
 `;
-
 const CollapsibleContent = styled.div<{ isOpen: boolean }>`
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
   overflow: auto; /* Change this line to make the content scrollable */
   max-height: 200px; /* Adjust the max height as needed */
 `;
-
 const RowContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -93,7 +80,7 @@ const CreateWardrobe: React.FC = () => {
     // Simulate an asynchronous operation (e.g., fetching data)
     const fetchData = async () => {
       // Simulate a delay (you can replace this with actual data fetching)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setIsLoading(false); // Set loading to false once data is fetched
     };
 
@@ -108,7 +95,7 @@ const CreateWardrobe: React.FC = () => {
   const clothingItems = [
     { imageUrl: 'your_image_url_1.jpg', itemName: 'Item 1', showRemoveButton: false },
     { imageUrl: 'your_image_url_2.jpg', itemName: 'Item 2', showRemoveButton: false },
-    // Add more items as needed
+
   ];
 
   const [menuItems, setMenuItems] = useState([
@@ -131,12 +118,12 @@ const CreateWardrobe: React.FC = () => {
   };
 
   const handleCardClick = (card: string) => {
-    // Your logic for handling card click
+    // Logic for handling card click
     console.log(`Clicked on ${card}`);
   };
 
   const handleRemoveCard = (card: string) => {
-    // Your logic for handling card removal
+    // Logic for handling card removal
     console.log(`Remove ${card}`);
   };
 
@@ -161,8 +148,7 @@ const CreateWardrobe: React.FC = () => {
 
             <RightColumn>
               <WardrobeInfoContainer>
-                <p>Add Items into Your Wardrobe</p>
-                {/* Vertical Menu replicated from CreateOutfit */}
+                <h2>Your Clothing Items</h2>
                 <VerticalMenu>
                   {menuItems.map((item, index) => (     
                     <div key={index}>

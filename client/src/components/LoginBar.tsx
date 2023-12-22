@@ -9,7 +9,6 @@ const Container = styled.div`
   top: 0;
   z-index: 100;
 `;
-
 const Navbar = styled.div`
   display: flex;
   justify-content: space-between;
@@ -26,7 +25,6 @@ const Navbar = styled.div`
     align-items: flex-start;
   }
 `;
-
 const Logo = styled.div`
   font-size: 2.5rem;
   color: #1e1e1e;
@@ -34,7 +32,6 @@ const Logo = styled.div`
   padding-left: 2rem;
   font-family: 'Niagara Solid';
 `;
-
 const Form = styled.form`
   display: flex;
   align-items: center;
@@ -44,7 +41,6 @@ const Form = styled.form`
     margin-top: 10px;
   }
 `;
-
 const Input = styled.input`
   margin-right: 10px;
   background-color: #fff;
@@ -65,7 +61,6 @@ const Input = styled.input`
     margin-bottom: 10px;
   }
 `;
-
 const Button = styled.button`
   background-color: #ffffff;
   border: 0;
@@ -111,8 +106,6 @@ const LoginBar: React.FC = () => {
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-
-    // Redirect to Dashboard page after "login"
     navigate('/dashboard');
   };
 

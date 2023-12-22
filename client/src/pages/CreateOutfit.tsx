@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/TopNav';
-import ClothingItem from '../components/ClothingItem'; // Import the ClothingItem component
+import ClothingItem from '../components/ClothingItem';
 import styled from 'styled-components';
 import Outfit from '../components/Outfit';
 import WardrobeSelect from '../components/WardrobeSelect';
@@ -13,72 +13,58 @@ const PageContainer = styled.div`
   flex-direction: column;
   height: 100vh;
 `;
-
 const ContentContainer = styled.div`
   display: flex;
   max-width: 100%;
   flex: 1;
 `;
-
 const LeftColumn = styled.div`
   width: 33.3%;
-  padding: 2rem;
+  padding: 3rem;
+  margin-top: 3rem;
 `;
-
 const RightColumn = styled.div`
   flex: 1;
-  padding: 2rem;
+  padding: 1rem;
   height: 100vh;
   display: flex;
   flex-direction: column;
-  align-items: center;
   justify-content: center;
-
+  margin-top: 1rem;
 `;
-
-
-const Dropdown = styled.select`
-  margin-bottom: 10px;
-  width: 100%;
-  padding: 5px;
-`;
-
 const VerticalMenu = styled.div`
   margin-bottom: 20px;
 `;
-
 const MenuItem = styled.div`
   cursor: pointer;
   padding: 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between;  // Add this line to align content horizontally
+  justify-content: space-between;  
 
   &:hover {
-    background-color: #A4A4A4;  // Change to the desired hover background color
+    background-color: #A4A4A4;  
     border-radius: 0.2rem;
   }
 `;
-
-
 const MenuArrow = styled.div<{ isOpen: boolean }>`
   margin-left: auto;
   transform: ${({ isOpen }) => (isOpen ? 'rotate(90deg)' : 'rotate(0deg)')};
   transition: transform 0.3s ease;
 `;
-
 const CollapsibleContent = styled.div<{ isOpen: boolean }>`
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
-  overflow: auto;  // Change this line to make the content scrollable
-  max-height: 200px;  // Adjust the max height as needed
+  overflow: auto; 
+  max-height: 200px;  
 `;
-
 const RowContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   width: 100%;
 `;
+
+
 
 const CreateOutfit: React.FC = () => {
   const [selectedWardrobe, setSelectedWardrobe] = useState<string>('');
@@ -96,8 +82,8 @@ const CreateOutfit: React.FC = () => {
   useEffect(() => {
     // Simulate an asynchronous operation (e.g., fetching data)
     const fetchData = async () => {
-      // Simulate a delay (you can replace this with actual data fetching)
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Simulate a delay 
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setIsLoading(false); // Set loading to false once data is fetched
     };
 
@@ -131,6 +117,8 @@ const CreateOutfit: React.FC = () => {
     });
   };
 
+
+
   const handleRemoveCard = (card: string) => {
     console.log('Removing card:', card); // Add this line for debugging
     setSelectedCards((prevSelectedCards) => prevSelectedCards.filter((selectedCard) => selectedCard !== card));
@@ -162,7 +150,6 @@ const CreateOutfit: React.FC = () => {
                 </MenuItem>
 
                 <CollapsibleContent isOpen={item.isOpen}>
-                  {/* Render ClothingItem components for this category in rows */}
                   <RowContainer>
                     {item.cards.map((card, cardIndex) => (
                       <ClothingItem
@@ -184,18 +171,16 @@ const CreateOutfit: React.FC = () => {
         </LeftColumn>
                       
         <RightColumn>
-          {/* Create Your Outfit */}
-          <div>
-            <p>Create Your Outfit</p>
+            <h2>Create Your Outfit</h2>
 
             <Outfit
-              selectedCards={selectedCards}
-              handleCardClick={handleCardClick}
-              handleRemoveCard={handleRemoveCard}
-            />
-          </div>
-
-  
+                  selectedCards={selectedCards}
+                  handleCardClick={handleCardClick}
+                  handleRemoveCard={handleRemoveCard} 
+                  showRemoveButton={true}
+                  isMyOutfitsContext={false}
+              />
+         
           <SaveButton onClick={() => console.log('Save button clicked')} />
         </RightColumn>
       </ContentContainer>

@@ -1,6 +1,5 @@
-import React from 'react';
-import styled,  { keyframes } from 'styled-components';
-
+import React, { useState } from 'react';
+import styled, { keyframes } from 'styled-components';
 
 const fadeIn = keyframes`
   from {
@@ -12,9 +11,8 @@ const fadeIn = keyframes`
     transform: translateY(0);
   }
 `;
-
 const ClothingItemContainer = styled.div`
-  position: relative; /* Change to relative positioning */
+  position: relative;
   border: 1px solid #ddd;
   align-items: center;
   border-radius: 8px;
@@ -27,15 +25,13 @@ const ClothingItemContainer = styled.div`
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  animation: ${fadeIn} 0.5s ease; // Add animation property
-`
-
+  animation: ${fadeIn} 0.5s ease;
+`;
 const Image = styled.img`
   max-width: 100%;
-  max-height: 150px; /* placeholder height and width */
+  max-height: 150px;
   border-radius: 8px;
 `;
-
 const RemoveButton = styled.button<{ showRemoveButton: boolean }>`
   background-color: #ff5757;
   color: #fff;
@@ -45,7 +41,6 @@ const RemoveButton = styled.button<{ showRemoveButton: boolean }>`
   cursor: pointer;
   display: ${({ showRemoveButton }) => (showRemoveButton ? 'block' : 'none')};
 `;
-
 const DeleteButton = styled.button`
   background-color: #a4a4a4;
   color: #ffff;
@@ -60,7 +55,43 @@ const DeleteButton = styled.button`
   &:hover {
     background-color: rgba(108, 94, 94, 0.8);
   }
-
+`;
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999; 
+`;
+const ModalContent = styled.div`
+  background: white;
+  color: #a4a4a4;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+`;
+const ConfirmButton = styled.button`
+  background-color: #4CAF50;
+  color: white;
+  padding: 0.5rem;
+  margin: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+`;
+const CancelButton = styled.button`
+  background-color: #FF0000;
+  color: white;
+  padding: 0.5rem;
+  margin: 0.5rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
 `;
 
 interface ClothingItemProps {
@@ -68,30 +99,52 @@ interface ClothingItemProps {
   itemName: string;
   onClick: () => void;
   onRemove: () => void;
-  onDelete: () => void; 
+  onDelete: () => void;
   showRemoveButton: boolean;
-  createWardrobeContext?: boolean; 
+  createWardrobeContext?: boolean;
+  isMyOutfitsContext?: boolean;
 }
 
-const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick, onRemove, onDelete, showRemoveButton, createWardrobeContext }) => {
+const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick, onRemove, onDelete, showRemoveButton, createWardrobeContext, isMyOutfitsContext }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     onClick();
   };
 
   const handleRemoveClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
     onRemove();
   };
 
   const handleDeleteClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); 
+    e.stopPropagation();
+    setIsModalOpen(true);
+  };
+
+  const handleCancel = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleConfirm = () => {
+    // Handle the confirmation logic here
     onDelete();
+    setIsModalOpen(false);
   };
 
   return (
     <ClothingItemContainer onClick={handleClick}>
-      {createWardrobeContext && <DeleteButton onClick={handleDeleteClick}>x</DeleteButton>}
+      {(createWardrobeContext || isMyOutfitsContext) && <DeleteButton onClick={handleDeleteClick}>x</DeleteButton>}
+      {isModalOpen && (
+        <ModalOverlay>
+          <ModalContent>
+            <p>Are you sure you want to remove this item from your wardrobe?</p>
+            <ConfirmButton onClick={handleConfirm}>Confirm</ConfirmButton>
+            <CancelButton onClick={handleCancel}>Cancel</CancelButton>
+          </ModalContent>
+        </ModalOverlay>
+      )}
       <Image src={imageUrl} alt={itemName} />
       <RemoveButton showRemoveButton={showRemoveButton} onClick={handleRemoveClick}>
         Remove

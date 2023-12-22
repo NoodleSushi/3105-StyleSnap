@@ -10,6 +10,8 @@ const GlobalStyles = createGlobalStyle`
   h2{
     font-family: 'Niagara Solid';
     font-size: 3rem;
+    line-height: 1rem;
+    margin: 0;
   }
 
   body {

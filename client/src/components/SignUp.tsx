@@ -13,8 +13,6 @@ const fadeIn = keyframes`
     transform: translateY(0);
   }
 `;
-
-
 const SignUpContainer = styled.div`
   position: relative;
   display: flex;
@@ -40,14 +38,12 @@ const SignUpContainer = styled.div`
     z-index: -1; 
   }
 `;
-
 const SignUpContentWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   width: 80%;
   
 `;
-
 const WelcomeText = styled.p`
   flex: 1;
   margin: 0;
@@ -55,7 +51,6 @@ const WelcomeText = styled.p`
   color: #fff;
   text-shadow: 9px 2px 4px rgba(0, 0, 0, 0.2);
 `;
-
 const SignUpForm = styled.form`
   flex: 1;
   align-items: center;
@@ -72,17 +67,14 @@ const SignUpForm = styled.form`
   animation: ${fadeIn} 1s ease-in-out forwards;
 
 `;
-
 const FormGroup = styled.div`
   width: 100%;
   text-align: left;
 `;
-
 const Label = styled.label`
   margin-bottom: 5px;
   color: #fff;
 `;
-
 const Input = styled.input`
   width: 100%;
   padding: 8px;

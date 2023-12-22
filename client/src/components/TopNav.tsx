@@ -7,7 +7,6 @@ const Container = styled.div`
   top: 0;
   z-index: 100;
 `;
-
 const Navbar = styled.div`
   display: flex;
   justify-content: space-between;
@@ -24,15 +23,23 @@ const Navbar = styled.div`
     align-items: flex-start;
   }
 `;
-
 const Logo = styled.div`
   font-size: 2.5rem;
   color: #1e1e1e;
   font-weight: bold;
   padding-left: 2rem;
   font-family: 'Niagara Solid';
-`;
+  transition: height 0.3s ease, color 0.3s ease;
 
+  &:hover {
+    color: white;  
+    border-radius: 0.2rem;
+  }
+`;
+const LogoLink = styled(Link)`
+  text-decoration: none;
+  cursor: pointer;
+`;
 const LinksContainer = styled.div`
   display: flex;
   align-items: center;
@@ -42,7 +49,6 @@ const LinksContainer = styled.div`
     margin-top: 10px;
   }
 `;
-
 const NavLink = styled(Link)`
   margin-right: 20px;
   color: #333;
@@ -61,8 +67,6 @@ const NavLink = styled(Link)`
     margin-bottom: 10px;
   }
 `;
-
-
 const CreateNewButton = styled.button`
   background-color: transparent;
   border: none;
@@ -78,7 +82,6 @@ const CreateNewButton = styled.button`
     transform: scale(1.05);
   }
 `;
-
 const CreateNewContent = styled.div<{ isOpen: boolean }>`
   display: ${(props) => (props.isOpen ? 'block' : 'none')};
   position: absolute;
@@ -107,7 +110,6 @@ const CreateNewContent = styled.div<{ isOpen: boolean }>`
     }
   }
 `;
-
 const CreateNewContainer = styled.div`
   position: relative;
   display: inline-block;
@@ -118,7 +120,6 @@ const CreateNewContainer = styled.div`
     }
   }
 `;
-
 const DropdownButton = styled.button`
   background-color: transparent;
   border: none;
@@ -134,7 +135,6 @@ const DropdownButton = styled.button`
     transform: scale(1.05);
   }
 `;
-
 const DropdownContent = styled.div<{ isOpen: boolean }>`
   display: ${(props) => (props.isOpen ? 'block' : 'none')};
   position: absolute;
@@ -163,7 +163,6 @@ const DropdownContent = styled.div<{ isOpen: boolean }>`
     }
   }
 `;
-
 const DropdownContainer = styled.div`
   position: relative;
   display: inline-block;
@@ -174,7 +173,6 @@ const DropdownContainer = styled.div`
     }
   }
 `;
-
 
 const TopNav: React.FC = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -192,7 +190,9 @@ const TopNav: React.FC = () => {
     <>
       <Container>
         <Navbar>
-          <Logo>SS</Logo>
+        <LogoLink to="/dashboard">
+            <Logo>SS</Logo>
+          </LogoLink>
           <LinksContainer>
             <NavLink to="/dashboard">Dashboard</NavLink>
             <CreateNewContainer>
