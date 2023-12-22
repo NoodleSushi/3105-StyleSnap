@@ -1,6 +1,8 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import axios from 'axios';
+import config from '../config';
 
 
 
@@ -103,10 +105,28 @@ const Button = styled.button`
 
 const LoginBar: React.FC = () => {
   const navigate = useNavigate();
+  const [username, setUsername] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [password, setPassword] = React.useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    navigate('/dashboard');
+    console.log("username: ", username);
+    console.log("email: ", email);
+    
+    axios.post(`${config.API}/auth/login`, {
+      username,
+      email,
+      password,
+    }).then((res) => {
+      if (res.status === 200) {
+        const token = res.data.accessToken as string;
+        console.log(res.data);
+        localStorage.setItem("token", token);
+        navigate("/dashboard", { replace: true });
+        window.location.reload();
+      }
+    });
   };
 
   return (
@@ -114,10 +134,31 @@ const LoginBar: React.FC = () => {
       <Container>
         <Navbar>
           <Logo>SS</Logo>
-          <Form onSubmit={handleLogin}>
-            <Input type="text" placeholder="Username" />
-            <Input type="email" placeholder="Email" />
-            <Input type="password" placeholder="Password" />
+          <Form>
+            <Input
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+            <Input
+              type="email"
+              name="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+            <Input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
             <Button type="submit" onClick={handleLogin}>Login</Button>
           </Form>
         </Navbar>
