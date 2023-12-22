@@ -2,6 +2,8 @@ import { useState } from 'react';
 import styled from 'styled-components';
 import signupImage from '../assets/signup.jpg';
 import { keyframes } from 'styled-components';
+import axios from 'axios';
+import config from '../config';
 
 const fadeIn = keyframes`
   from {
@@ -139,7 +141,19 @@ const SignUp = () => {
   const handleSignUp = () => {
     if (password === confirmPassword) {
       console.log('Signing up with:', email, username, password);
-      // Front-end validation or other UI-related logic
+      axios.post(`${config.API}/auth/signup`, {
+        email,
+        username,
+        password,
+      })
+        .then((res) => {
+          console.log(res);
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.log(err);
+          // UI feedback for error
+        });
     } else {
       console.log('Passwords do not match. Please try again.');
       // UI feedback for password mismatch
