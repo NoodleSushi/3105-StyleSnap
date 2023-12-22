@@ -35,7 +35,7 @@ const ModalOverlay = styled.div`
 const ModalContent = styled.div`
   background: white;
   color: #a4a4a4;
-  padding: 20px;
+  padding: 2rem;
   border-radius: 8px;
   text-align: center;
 `;
@@ -57,6 +57,7 @@ const NoButton = styled.button`
   color: white;
   padding: 10px 20px;
   border: none;
+  margin: 0.2rem;
   border-radius: 4px;
   cursor: pointer;
 
@@ -65,29 +66,51 @@ const NoButton = styled.button`
   }
 `;
 
+const InputField = styled.input`
+  padding: 8px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 80%; 
+  margin: 0 auto; 
+  display: block; 
+`;
+
 interface AddWardrobeProps {
-  onClick: () => void;
+  onClick: (wardrobeName: string) => void;
 }
 
 const AddWardrobe: React.FC<AddWardrobeProps> = ({ onClick }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [wardrobeName, setWardrobeName] = useState('');
 
   const handleButtonClick = () => {
     setIsModalOpen(true);
   };
 
   const handleYesClick = () => {
-    onClick();
-    setConfirmationMessage('Wardrobe has been added.');
+    if (wardrobeName.trim() === '') {
+      setConfirmationMessage('Please enter a valid wardrobe name.');
+      return;
+    }
+
+    setConfirmationMessage('Are you sure you want to add this wardrobe?');
 
     setTimeout(() => {
-      setIsModalOpen(false);
-    }, 1000);
+      onClick(wardrobeName);
+      setConfirmationMessage('Wardrobe has been added.');
+
+      setTimeout(() => {
+        setIsModalOpen(false);
+        setWardrobeName('');
+      }, 1000);
+    }, 1500);
   };
 
   const handleNoClick = () => {
     setIsModalOpen(false);
+    setWardrobeName('');
   };
 
   return (
@@ -99,9 +122,15 @@ const AddWardrobe: React.FC<AddWardrobeProps> = ({ onClick }) => {
       {isModalOpen && (
         <ModalOverlay>
           <ModalContent>
-            <p>Add another wardrobe?</p>
+            <InputField
+              type="text"
+              placeholder="Enter the name of the wardrobe"
+              value={wardrobeName}
+              onChange={(e) => setWardrobeName(e.target.value)}
+            />
             <YesButton onClick={handleYesClick}>Yes</YesButton>
             <NoButton onClick={handleNoClick}>No</NoButton>
+            {confirmationMessage && <p>{confirmationMessage}</p>}
           </ModalContent>
         </ModalOverlay>
       )}

@@ -8,34 +8,37 @@ import AddWardrobe from '../components/AddWardrobe';
 import WardrobeSelect from '../components/WardrobeSelect';
 import ShimmerEffect from '../components/ShimmerEffect';
 
-
 const PageContainer = styled.div`
   display: flex;
   flex-direction: column;
   min-height: 100vh;
 `;
+
 const ContentContainer = styled.div`
   display: flex;
   max-width: 100%;
   flex: 1;
   overflow-y: auto;
 `;
+
 const LeftColumn = styled.div`
   width: 30%;
   padding: 3rem;
 `;
+
 const RightColumn = styled.div`
   flex: 1;
   padding: 3rem;
   height: 100%;
   display: flex;
-  flex-wrap: wrap; 
-  justify-content: space-between; 
-  width: 100%; 
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
 `;
+
 const WardrobeInfoContainer = styled.div`
-  width: 100%; /* Ensure full width */
-  margin-bottom: 20px; /* Add margin between the <p> and VerticalMenu */
+  width: 100%;
+  margin-bottom: 20px;
 `;
 
 const VerticalMenu = styled.div`
@@ -43,28 +46,32 @@ const VerticalMenu = styled.div`
   width: 80%;
   padding: 2rem;
 `;
+
 const MenuItem = styled.div`
   cursor: pointer;
   padding: 10px;
   display: flex;
   align-items: center;
-  justify-content: space-between; /* Add this line to align content horizontally */
+  justify-content: space-between;
 
   &:hover {
-    background-color: #A4A4A4; /* Change to the desired hover background color */
+    background-color: #A4A4A4;
     border-radius: 0.2rem;
   }
 `;
+
 const MenuArrow = styled.div<{ isOpen: boolean }>`
   margin-left: auto;
   transform: ${({ isOpen }) => (isOpen ? 'rotate(90deg)' : 'rotate(0deg)')};
   transition: transform 0.3s ease;
 `;
+
 const CollapsibleContent = styled.div<{ isOpen: boolean }>`
   display: ${({ isOpen }) => (isOpen ? 'block' : 'none')};
-  overflow: auto; /* Change this line to make the content scrollable */
-  max-height: 200px; /* Adjust the max height as needed */
+  overflow: auto;
+  max-height: 200px;
 `;
+
 const RowContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -72,16 +79,82 @@ const RowContainer = styled.div`
   width: 100%;
 `;
 
+const DeleteWardrobeButton = styled.button`
+  background-color: transparent;
+  color: #fff;
+  padding: 10px 20px;
+  border: 2px solid #333;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+
+  &:hover {
+    background-color: #f44336;
+    color: white;
+  }
+`;
+
+const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+`;
+
+const ModalContent = styled.div`
+  background: white;
+  color: #a4a4a4;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+`;
+
+const YesButton = styled.button`
+  background-color: #4caf50;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-right: 10px;
+
+  &:hover {
+    background-color: #45a049;
+  }
+`;
+
+const NoButton = styled.button`
+  background-color: #f44336;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  margin: 0.2rem;
+  border-radius: 4px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: #d32f2f;
+  }
+`;
+
 const CreateWardrobe: React.FC = () => {
   const [selectedWardrobe, setSelectedWardrobe] = useState<string>('wardrobe1');
   const [isLoading, setIsLoading] = useState(true);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   useEffect(() => {
-    // Simulate an asynchronous operation (e.g., fetching data)
     const fetchData = async () => {
-      // Simulate a delay (you can replace this with actual data fetching)
       await new Promise(resolve => setTimeout(resolve, 1500));
-      setIsLoading(false); // Set loading to false once data is fetched
+      setIsLoading(false);
     };
 
     fetchData();
@@ -91,11 +164,22 @@ const CreateWardrobe: React.FC = () => {
     setSelectedWardrobe(value);
   };
 
-  // Sample data for ClothingItem components
+  const handleDeleteWardrobeClick = () => {
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleYesClick = () => {
+    console.log('Wardrobe deleted');
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleNoClick = () => {
+    setIsDeleteModalOpen(false);
+  };
+
   const clothingItems = [
     { imageUrl: 'your_image_url_1.jpg', itemName: 'Item 1', showRemoveButton: false },
     { imageUrl: 'your_image_url_2.jpg', itemName: 'Item 2', showRemoveButton: false },
-
   ];
 
   const [menuItems, setMenuItems] = useState([
@@ -118,39 +202,38 @@ const CreateWardrobe: React.FC = () => {
   };
 
   const handleCardClick = (card: string) => {
-    // Logic for handling card click
     console.log(`Clicked on ${card}`);
   };
 
   const handleRemoveCard = (card: string) => {
-    // Logic for handling card removal
     console.log(`Remove ${card}`);
   };
 
   const handleDeleteClick = () => {
-    // Logic for ClothingItem deletion from the database
     console.log('Delete button clicked');
   };
 
   return (
-
     <PageContainer>
       <Navbar />
       {isLoading ? (
         <ShimmerEffect style={{ flex: 1, padding: '2rem' }} />
       ) : (
-      <>
-      <ContentContainer>
+        <>
+          <ContentContainer>
             <LeftColumn>
-            <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} />
+              <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} />
               <AddWardrobe onClick={() => console.log('Add Wardrobe clicked')} />
+              <DeleteWardrobeButton onClick={handleDeleteWardrobeClick}>
+                Delete Wardrobe
+              </DeleteWardrobeButton>
             </LeftColumn>
 
             <RightColumn>
               <WardrobeInfoContainer>
                 <h2>Your Clothing Items</h2>
                 <VerticalMenu>
-                  {menuItems.map((item, index) => (     
+                  {menuItems.map((item, index) => (
                     <div key={index}>
                       <MenuItem onClick={() => toggleMenu(index)}>
                         {item.category}
@@ -168,7 +251,8 @@ const CreateWardrobe: React.FC = () => {
                               onRemove={() => handleRemoveCard(card)}
                               onDelete={() => handleDeleteClick()}
                               showRemoveButton={false}
-                              createWardrobeContext={true} />
+                              createWardrobeContext={true}
+                            />
                           ))}
                         </RowContainer>
                       </CollapsibleContent>
@@ -182,8 +266,17 @@ const CreateWardrobe: React.FC = () => {
           </ContentContainer>
 
           <Footer />
-       </>
-       )}
+          {isDeleteModalOpen && (
+            <ModalOverlay>
+              <ModalContent>
+                <p>Are you sure you want to delete this wardrobe?</p>
+                <YesButton onClick={handleYesClick}>Yes</YesButton>
+                <NoButton onClick={handleNoClick}>No</NoButton>
+              </ModalContent>
+            </ModalOverlay>
+          )}
+        </>
+      )}
     </PageContainer>
   );
 };
