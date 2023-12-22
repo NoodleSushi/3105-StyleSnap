@@ -1,7 +1,7 @@
 import { Request, RequestHandler } from "express";
 import { validationResult } from "express-validator";
 import * as db from "../db";
-import { hashPassword, comparePassword, createAccessToken, verifyAccessToken } from "./authUtils";
+import { hashPassword, comparePassword, createAccessToken, verifyAccessToken, userInfoResult } from "./authUtils";
 import { UserAuthInput, UserAuthUserInput } from "../interfaces";
 import { statusServerError, statusSuccessOK, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError, statusSuccessCreated } from "./responseGenerators";
 
@@ -67,6 +67,20 @@ export const loginUser: RequestHandler = async (req, res) => {
 
     return statusSuccessOK(res, "User login successful.",
       { accessToken }
+    );
+  } catch (err) {
+    return statusServerError(res, err);
+  }
+}
+
+export const getCurrentUser: RequestHandler = async (req, res) => {
+  try {
+    const user = userInfoResult(req);
+    if (!user)
+      return statusServerError(res);
+    
+    return statusSuccessOK(res, "User data retrieved.",
+      { user }
     );
   } catch (err) {
     return statusServerError(res, err);
