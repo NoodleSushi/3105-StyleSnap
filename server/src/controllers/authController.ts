@@ -1,16 +1,17 @@
 import { Request, RequestHandler } from "express";
 import { validationResult } from "express-validator";
-import * as db from "./db";
-import { hashPassword, comparePassword, createAccessToken, userInfoResult } from "./authUtils";
-import { User, UserAuthInput, UserAuthUserInput, UserInfo } from "../interfaces";
+import * as db from "../db";
+import { hashPassword, comparePassword, createAccessToken, verifyAccessToken } from "./authUtils";
+import { UserAuthInput, UserAuthUserInput } from "../interfaces";
 import { statusServerError, statusSuccessOK, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError, statusSuccessCreated } from "./responseGenerators";
-import jwt from "jsonwebtoken";
 
 export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "user") => async (req: Request, res, next) => {
   try {
     const authorization = req.headers.authorization || "";
     const accessToken = authorization.match(/^Bearer (\S+)/)![1];
-    const user = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SCERET!) as UserInfo;
+    const user = verifyAccessToken(accessToken);
+    if (!user)
+      return statusClientUnauthorizedError(res, "Invalid access token.");
     if (mode === "admin" && !user.isAdmin)
       return statusClientForbiddenError(res);
     (req as any).user = user;

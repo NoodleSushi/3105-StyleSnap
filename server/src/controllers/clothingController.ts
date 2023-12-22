@@ -1,10 +1,9 @@
 import { RequestHandler } from 'express';
 import { statusClientForbiddenError, statusClientNotFoundError, statusServerError, statusSuccessCreated, statusSuccessOK, statusValidationError } from './responseGenerators';
-import * as db from './db';
-import { ClothingInput } from '../interfaces';
+import * as db from '../db';
+import { ClothingInput, ClothingUpdateInput } from '../interfaces';
 import { userInfoResult } from './authUtils';
-import { uploadDirectory } from '../routes/multer';
-import path from 'path';
+import { getImageUrl } from '../multer';
 
 export const getClothingTypeHierarchy : RequestHandler = async (req, res) => {
   try {
@@ -96,11 +95,35 @@ export const createClothing: RequestHandler = async (req, res) => {
   }
 }
 
+export const updateClothing: RequestHandler = async (req, res) => {
+  const statusValidErr = statusValidationError(req, res);
+  if (statusValidErr)
+    return statusValidErr;
 
-export const getImageUrl = (req: { [k: string]: any }, filename: string): string => {
-  const url = new URL(`${req.protocol}://${req.get('host')}`);
-  url.pathname = path.join(url.pathname, uploadDirectory, filename);
-  return url.toString();
+  try {
+    const user = userInfoResult(req);
+    if (!user)
+      return statusServerError(res);
+  
+    const clothingId = Number(req.params.clothingId);
+    const clothing = await db.getClothing(clothingId);
+    if (!clothing)
+      return statusClientNotFoundError(res, "Clothing not found.");
+
+    const wardrobe = await db.getWardrobe(clothing.wardrobeId);
+    if (!wardrobe)
+      return statusClientNotFoundError(res, "Wardrobe not found.");
+    if (wardrobe.owner !== user.userId && !user.isAdmin)
+      return statusClientForbiddenError(res, "You do not have permission to update this clothing.");
+
+    const imageFilename = req.file && req.file.filename || undefined;
+
+    const clothingInput: ClothingUpdateInput = { ...req.body, clothingId, image: imageFilename };
+    await db.updateClothing(clothingInput);
+    return statusSuccessOK(res, "Clothing updated.");
+  } catch (err) {
+    return statusServerError(res, err);
+  }
 }
 
 export const getClothing: RequestHandler = async (req, res) => {
