@@ -1,6 +1,9 @@
+import { useAtom } from 'jotai';
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
+import profile from '../profile';
+import axios from 'axios';
 
 const Container = styled.div`
   position: sticky;
@@ -177,6 +180,7 @@ const DropdownContainer = styled.div`
 const TopNav: React.FC = () => {
   const [isDropdownOpen, setDropdownOpen] = useState(false);
   const [isNewDropdownOpen, setNewDropdownOpen] = useState(false);
+  const [username] = useAtom(profile.usernameAtom);
 
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -184,6 +188,11 @@ const TopNav: React.FC = () => {
 
   const toggleNewDropdown = () => {
     setNewDropdownOpen((prev) => !prev);
+  };
+
+  const handleLogout = () => {
+    axios.defaults.headers.common['Authorization'] = '';
+    localStorage.removeItem('token');
   };
 
   return (
@@ -204,10 +213,10 @@ const TopNav: React.FC = () => {
             </CreateNewContainer>
             <NavLink to="/my-outfits">My Outfits</NavLink>
             <DropdownContainer>
-              <DropdownButton onClick={toggleDropdown}>Username</DropdownButton>
+              <DropdownButton onClick={toggleDropdown}>{username}</DropdownButton>
               <DropdownContent isOpen={isDropdownOpen}>
                 <Link to="/settings">Settings (way labot)</Link>
-                <Link to="/">Logout</Link>
+                <Link to="/" onClick={handleLogout} replace reloadDocument>Logout</Link>
               </DropdownContent>
             </DropdownContainer>
           </LinksContainer>

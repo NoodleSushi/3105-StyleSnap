@@ -42,3 +42,13 @@ export interface Clothing {
 
 export type ClothingInput = Omit<Clothing, "clothingId">;
 export type ClothingUpdateInput = Optional<Omit<Clothing, "wardrobeId">, "clothingTypeId" | "name" | "image">;
+
+export interface Outfit {
+  outfitId: number;
+  ownerId: number;
+  name: string;
+  clothingIds?: number[];
+}
+
+export type OutfitInput = Omit<Outfit, "outfitId">;
+export type OutfitUpdateInput = Optional<Omit<Outfit, "ownerId">, "name">;

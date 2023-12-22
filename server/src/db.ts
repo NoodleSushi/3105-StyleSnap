@@ -1,7 +1,7 @@
 import mysql, { ConnectionOptions, ResultSetHeader, RowDataPacket } from "mysql2";
 import dotenv from "dotenv";
 import SQL from "sql-template-strings";
-import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, Wardrobe, WardrobeUserInput, WardrobeInput, Clothing, ClothingUpdateInput } from "./interfaces";
+import { ClothingCategory, ClothingType, ClothingInput, User, UserAuthInput, Wardrobe, WardrobeUserInput, WardrobeInput, Clothing, ClothingUpdateInput, OutfitInput, OutfitUpdateInput, Outfit } from "./interfaces";
 
 dotenv.config();
 
@@ -273,6 +273,175 @@ export const deleteClothing = async (clothingId: number): Promise<void> => {
   try {
     const query = SQL`DELETE FROM Clothing WHERE clothing_id = ${clothingId}`;
     await db.promise().query(query);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const isClothesExist = async (clothingIds: number[]): Promise<boolean> => {
+  try {
+    clothingIds = [...new Set(clothingIds)];
+    
+    const query = SQL`SELECT COUNT(*) AS count FROM Clothing WHERE clothing_id IN (${clothingIds})`;
+    const [result] = await db.promise().query<RowDataPacket[]>(query);
+    const row = result && result[0];
+    return row && row.count == clothingIds.length || false;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const isClothesAuthorized = async (userId: number, clothingIds: number[]): Promise<boolean> => {
+  try {
+    clothingIds = [...new Set(clothingIds)];
+
+    const query = SQL`SELECT COUNT(*) AS count FROM Clothing INNER JOIN Wardrobe ON Clothing.wardrobe_id = Wardrobe.wardrobe_id WHERE Clothing.clothing_id IN (${clothingIds}) AND Wardrobe.owner = ${userId}`;
+    const [result] = await db.promise().query<RowDataPacket[]>(query);
+    const row = result && result[0];
+    return row && row.count == clothingIds.length || false;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const createOutfit = async (outfit: OutfitInput): Promise<number> => {
+  try {
+    const query = SQL`INSERT INTO Outfit (owner_id, name) VALUES (${outfit.ownerId}, ${outfit.name})`;
+    const [result] = await db.promise().query<ResultSetHeader>(query);
+    const { insertId } = result;
+    return insertId;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const deleteOutfit = async (outfitId: number): Promise<boolean> => {
+  try {
+    const deleteAssociationsQuery = SQL`DELETE FROM OutfitClothes WHERE outfit_id = ${outfitId}`;
+    await db.promise().query(deleteAssociationsQuery);
+
+    const deleteOutfitQuery = SQL`DELETE FROM Outfit WHERE outfit_id = ${outfitId}`;
+    const [result] = await db.promise().query<ResultSetHeader>(deleteOutfitQuery);
+    return result.affectedRows > 0;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getOutfit = async (outfitId: number): Promise<Outfit | null> => {
+  try {
+    const outfitQuery = SQL`SELECT * FROM Outfit WHERE outfit_id = ${outfitId}`;
+    const [outfitResult] = await db.promise().query<(RowDataPacket)[]>(outfitQuery);
+    const outfitRow = outfitResult && outfitResult[0];
+    if (!outfitRow) {
+      return null;
+    }
+
+    const clothingIdsQuery = SQL`SELECT clothing_id FROM OutfitClothes WHERE outfit_id = ${outfitId}`;
+    const [clothingIdsResult] = await db.promise().query<(RowDataPacket)[]>(clothingIdsQuery);
+    const clothingIds = clothingIdsResult.map(row => row.clothing_id);
+
+    return {
+      outfitId: outfitRow.outfit_id,
+      ownerId: outfitRow.owner_id,
+      name: outfitRow.name,
+      clothingIds,
+    };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getOutfitsByUser = async (userId: number): Promise<Outfit[]> => {
+  try {
+    const outfitQuery = SQL`SELECT * FROM Outfit WHERE owner_id = ${userId}`;
+    const [outfitResult] = await db.promise().query<(RowDataPacket)[]>(outfitQuery);
+    const outfits = outfitResult.map(row => ({
+      outfitId: row.outfit_id,
+      ownerId: row.owner_id,
+      name: row.name,
+      clothingIds: [] as number[],
+    }));
+
+    const clothingIdsQuery = SQL`SELECT outfit_id, clothing_id FROM OutfitClothes WHERE outfit_id IN (${outfits.map(outfit => outfit.outfitId)})`;
+    const [clothingIdsResult] = await db.promise().query<(RowDataPacket)[]>(clothingIdsQuery);
+    const clothingIds = clothingIdsResult.reduce((acc: Record<number, number[]>, row) => {
+      const { outfit_id: outfitId, clothing_id: clothingId } = row;
+      if (acc[outfitId]) {
+        acc[outfitId].push(clothingId);
+      } else {
+        acc[outfitId] = [clothingId];
+      }
+      return acc;
+    }, {});
+
+    for (const outfit of outfits) {
+      outfit.clothingIds = clothingIds[outfit.outfitId] || [];
+    }
+
+    return outfits;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const updateOutfitClothes = async (outfitId: number, clothingIds: number[] | undefined): Promise<void> => {
+  try {
+    clothingIds = [...new Set(clothingIds)];
+
+    const deleteQuery = SQL`DELETE FROM OutfitClothes WHERE clothing_id NOT IN (${clothingIds}) AND outfit_id = ${outfitId}`;
+    await db.promise().query(deleteQuery);
+
+    const insertQuery = SQL`INSERT INTO OutfitClothes (outfit_id, clothing_id) VALUES `;
+    for (let i = 0; i < clothingIds.length; i++) {
+      insertQuery.append(SQL`(${outfitId}, ${clothingIds[i]})`);
+      if (i !== clothingIds.length - 1) {
+        insertQuery.append(SQL`, `);
+      }
+    }
+
+    insertQuery.append(SQL` ON DUPLICATE KEY UPDATE clothing_id = VALUES(clothing_id)`);
+    await db.promise().query(insertQuery);
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const getOutfitClothes = async (outfitId: number): Promise<Clothing[]> => {
+  try {
+    const query = SQL`SELECT * FROM Clothing WHERE clothing_id IN (SELECT clothing_id FROM OutfitClothes WHERE outfit_id = ${outfitId})`;
+    const [result] = await db.promise().query<(RowDataPacket)[]>(query);
+    return result.map(row => ({
+      clothingId: row.clothing_id,
+      wardrobeId: row.wardrobe_id,
+      clothingTypeId: row.clothing_type_id,
+      name: row.name,
+      image: row.image,
+    }));
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const updateOutfit = async (outfitId: number, input: OutfitUpdateInput): Promise<boolean> => {
+  try {
+    let table: Record<string, any> = {
+      name: input.name,
+    };
+    table = Object.fromEntries(Object.entries(table).filter(([_, value]) => value !== undefined));
+
+    const query = SQL`UPDATE Outfit SET `;
+    const entries = Object.entries(table);
+    for (let i = 0; i < entries.length; i++) {
+      const [key, value] = entries[i];
+      query.append(SQL``.append(mysql.escapeId(key)).append(SQL` = ${value}`));
+      if (i !== entries.length - 1) {
+        query.append(SQL`, `);
+      }
+    }
+    query.append(SQL` WHERE outfit_id = ${outfitId}`);
+    const [result] = await db.promise().query<ResultSetHeader>(query);
+    return result.affectedRows > 0;
   } catch (error) {
     throw error;
   }
