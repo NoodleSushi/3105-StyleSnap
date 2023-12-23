@@ -196,13 +196,13 @@ const Dashboard: React.FC = () => {
     setSelectedWardrobe(value);
   };
 
-  const handleCardClick = (cardId: number) => {
-    console.log(`Card clicked: ${cardId}`);
+  const handleCardClick = (card: { id: number, name: string, imageUrl?: string }) => {
+    console.log(`Card clicked: ${card}`);
     // Logic for handling cards
   };
 
-  const handleRemoveCard = (cardId: number) => {
-    console.log(`Remove card: ${cardId}`);
+  const handleRemoveCard = (card: { id: number, name: string, imageUrl?: string }) => {
+    console.log(`Remove card: ${card}`);
     // Logic for removing card 
   };
 
@@ -262,8 +262,8 @@ const Dashboard: React.FC = () => {
                         key={cardIndex}
                         imageUrl={card.imageUrl || `your_image_url_${cardIndex + 1}.jpg`}
                         itemName={card.name}
-                        onClick={() => handleCardClick(card.id)}
-                        onRemove={() => handleRemoveCard(card.id)}
+                        onClick={() => handleCardClick(card)}
+                        onRemove={() => handleRemoveCard(card)}
 
                         showRemoveButton={false} onDelete={function (): void {
                           throw new Error('Function not implemented.');
