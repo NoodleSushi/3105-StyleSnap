@@ -1,4 +1,4 @@
-import { UserInfo } from "./interfaces";
+import { UserInfo } from "./common/interfaces";
 
 declare namespace NodeJS {
   export interface ProcessEnv {

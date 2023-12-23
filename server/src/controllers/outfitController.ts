@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express';
-import { statusClientForbiddenError, statusClientNotFoundError, statusServerError, statusSuccessCreated, statusSuccessOK, statusValidationError } from './responseGenerators';
-import * as db from '../db';
+import { statusClientForbiddenError, statusClientNotFoundError, statusServerError, statusSuccessCreated, statusSuccessOK, statusValidationError } from '../common/responseGenerators';
+import * as db from '../common/db';
 import { userInfoResult } from './authUtils';
-import { OutfitInput, OutfitUpdateInput } from '../interfaces';
-import { getImageUrl } from '../multer';
+import { OutfitInput, OutfitUpdateInput } from '../common/interfaces';
+import { getImageUrl } from '../common/multer';
 
 export const createOutfit: RequestHandler = async (req, res) => {
   const statusValidErr = statusValidationError(req, res);

@@ -1,5 +1,5 @@
 import fs from "fs";
-import { createMultilineConnection, DB_DATABASE } from "../db";
+import { createMultilineConnection, DB_DATABASE } from "../common/db";
 import { Connection } from "mysql2";
 import YAML from "yaml";
 import { hashPassword } from "../controllers/authUtils";

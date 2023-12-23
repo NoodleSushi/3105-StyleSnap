@@ -1,6 +1,6 @@
 import { RequestHandler } from "express-serve-static-core";
 import { param } from "express-validator";
-import { statusClientBadRequestError } from "../controllers/responseGenerators";
+import { statusClientBadRequestError } from "../common/responseGenerators";
 import { MulterError } from "multer";
 
 export const userIdParamValidator = () => param("userId")

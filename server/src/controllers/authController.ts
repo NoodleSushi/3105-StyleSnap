@@ -1,9 +1,9 @@
 import { Request, RequestHandler } from "express";
 import { validationResult } from "express-validator";
-import * as db from "../db";
+import * as db from "../common/db";
 import { hashPassword, comparePassword, createAccessToken, verifyAccessToken, userInfoResult } from "./authUtils";
-import { UserAuthInput, UserAuthUserInput } from "../interfaces";
-import { statusServerError, statusSuccessOK, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError, statusSuccessCreated } from "./responseGenerators";
+import { UserAuthInput, UserAuthUserInput } from "../common/interfaces";
+import { statusServerError, statusSuccessOK, statusValidationError, statusClientUnauthorizedError, statusClientForbiddenError, statusSuccessCreated } from "../common/responseGenerators";
 
 export const attachUser: (mode?: "user" | "admin") => RequestHandler = (mode = "user") => async (req: Request, res, next) => {
   try {

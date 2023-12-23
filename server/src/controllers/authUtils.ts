@@ -1,6 +1,6 @@
 import { hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
-import { UserInfo } from "../interfaces";
+import { UserInfo } from "../common/interfaces";
 
 export const hashPassword = async (password: string): Promise<string> => {
   const hashedPassword = await hash(password, 3);

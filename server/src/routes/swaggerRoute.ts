@@ -5,8 +5,8 @@ import YAML from "yaml";
 
 const swaggerDocument = YAML.parse(fs.readFileSync("docs/swagger.yaml", "utf8"));
 
-const swaggerRouter = Router();
+const swaggerRoute = Router();
 
-swaggerRouter.use(swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+swaggerRoute.use(swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-export default swaggerRouter;
+export default swaggerRoute;

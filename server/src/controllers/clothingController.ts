@@ -1,9 +1,9 @@
 import { RequestHandler } from 'express';
-import { statusClientForbiddenError, statusClientNotFoundError, statusServerError, statusSuccessCreated, statusSuccessOK, statusValidationError } from './responseGenerators';
-import * as db from '../db';
-import { ClothingInput, ClothingUpdateInput } from '../interfaces';
+import { statusClientForbiddenError, statusClientNotFoundError, statusServerError, statusSuccessCreated, statusSuccessOK, statusValidationError } from '../common/responseGenerators';
+import * as db from '../common/db';
+import { ClothingInput, ClothingUpdateInput } from '../common/interfaces';
 import { userInfoResult } from './authUtils';
-import { getImageUrl } from '../multer';
+import { getImageUrl } from '../common/multer';
 
 export const getClothingTypeHierarchy : RequestHandler = async (req, res) => {
   try {

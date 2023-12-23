@@ -1,5 +1,5 @@
 import { body, header } from "express-validator";
-import { isEmailTaken, isUsernameTaken } from "../db";
+import { isEmailTaken, isUsernameTaken } from "../common/db";
 
 const usernameValidator = (checkTaken: boolean = false) => body("username")
   .trim()
