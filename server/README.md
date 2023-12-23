@@ -2,7 +2,12 @@
 
 ## API Documentation
 
-Swagger API documentation can be accessed `<scheme>://<host>/api-docs/`
+Swagger API documentation can be accessed `http://<host>/api-docs/`
+
+## Recommended Requirements
+
+- Node.js v20.10.0
+- MySQL 8.0.35
 
 ## Setup Instructions
 
@@ -49,8 +54,3 @@ For dev testing:
 ```console
 npm run dev
 ```
-
-## Recommended Requirements
-
-- Node.js v20.10.0
-- MySQL 8.0.35
