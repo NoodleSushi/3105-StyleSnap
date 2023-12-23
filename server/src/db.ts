@@ -377,7 +377,12 @@ export const getOutfit = async (outfitId: number): Promise<Outfit | null> => {
   }
 }
 
-export const getOutfitsByUser = async (userId: number): Promise<Outfit[]> => {
+export const getOutfitsByUser = async (userId: number): Promise<{
+  outfitId: number;
+  ownerId: number;
+  name: string;
+  clothes: Clothing[];
+}[]> => {
   try {
     const outfitQuery = SQL`SELECT * FROM Outfit WHERE owner_id = ${userId}`;
     const [outfitResult] = await db.promise().query<(RowDataPacket)[]>(outfitQuery);

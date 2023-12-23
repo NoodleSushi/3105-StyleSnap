@@ -3,6 +3,7 @@ import { statusClientForbiddenError, statusClientNotFoundError, statusServerErro
 import * as db from '../db';
 import { userInfoResult } from './authUtils';
 import { OutfitInput, OutfitUpdateInput } from '../interfaces';
+import { getImageUrl } from '../multer';
 
 export const createOutfit: RequestHandler = async (req, res) => {
   const statusValidErr = statusValidationError(req, res);
@@ -62,6 +63,13 @@ export const getOutfitsByUser: RequestHandler = async (req, res) => {
       return statusServerError(res);
 
     const outfits = await db.getOutfitsByUser(user.userId);
+    // normalize clothes image into urls
+    for (const outfit of outfits) {
+      for (const clothing of outfit.clothes) {
+        clothing.image = getImageUrl(req, clothing.image);
+      }
+    }
+    
     return statusSuccessOK(res, "Outfits retrieval successful", { outfits });
   } catch (err) {
     return statusServerError(res, err);
