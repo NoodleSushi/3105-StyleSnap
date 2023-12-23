@@ -62,7 +62,7 @@ export const getOutfitsByUser: RequestHandler = async (req, res) => {
       return statusServerError(res);
 
     const outfits = await db.getOutfitsByUser(user.userId);
-    return statusSuccessOK(res, "Outfits retrieval successful", outfits);
+    return statusSuccessOK(res, "Outfits retrieval successful", { outfits });
   } catch (err) {
     return statusServerError(res, err);
   }

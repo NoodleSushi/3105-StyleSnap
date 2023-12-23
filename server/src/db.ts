@@ -385,8 +385,12 @@ export const getOutfitsByUser = async (userId: number): Promise<Outfit[]> => {
       outfitId: row.outfit_id,
       ownerId: row.owner_id,
       name: row.name,
-      clothingIds: [] as number[],
+      clothes: [] as Clothing[],
     }));
+
+    if (outfits.length === 0) {
+      return outfits;
+    }
 
     const clothingIdsQuery = SQL`SELECT outfit_id, clothing_id FROM OutfitClothes WHERE outfit_id IN (${outfits.map(outfit => outfit.outfitId)})`;
     const [clothingIdsResult] = await db.promise().query<(RowDataPacket)[]>(clothingIdsQuery);
@@ -401,8 +405,18 @@ export const getOutfitsByUser = async (userId: number): Promise<Outfit[]> => {
     }, {});
 
     for (const outfit of outfits) {
-      outfit.clothingIds = clothingIds[outfit.outfitId] || [];
+      const clothingQuery = SQL`SELECT * FROM Clothing WHERE clothing_id IN (${clothingIds[outfit.outfitId] || []})`;
+      const [clothingResult] = await db.promise().query<(RowDataPacket)[]>(clothingQuery);
+      outfit.clothes = clothingResult.map((value) => ({ 
+        clothingId: value.clothing_id,
+        wardrobeId: value.wardrobe_id,
+        clothingTypeId: value.clothing_type_id,
+        name: value.name,
+        image: value.image,
+      })) as Clothing[];
     }
+    
+    
 
     return outfits;
   } catch (error) {
