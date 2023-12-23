@@ -183,7 +183,7 @@ const Dashboard: React.FC = () => {
                 name: item.name,
                 imageUrl: item.image,
               })),
-            }));
+            })).filter((item) => item.cards.length > 0);
             setMenuItems(clothingByCategory);
           })
           .catch((err) => {
