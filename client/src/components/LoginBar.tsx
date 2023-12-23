@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import axios from 'axios';
-import config from '../config';
 
 
 
@@ -114,7 +113,7 @@ const LoginBar: React.FC = () => {
     console.log("username: ", username);
     console.log("email: ", email);
     
-    axios.post(`${config.API}/auth/login`, {
+    axios.post(`${import.meta.env.VITE_API}/auth/login`, {
       username,
       email,
       password,

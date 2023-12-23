@@ -9,7 +9,6 @@ import MyOutfits from './pages/MyOutfts';
 import axios from 'axios';
 import profile from './profile';
 import { useAtom } from 'jotai';
-import config from './config';
 
 const PrivateWrapper = ({ children, login = true }: {children: JSX.Element, login?: boolean}) => {
   const [, setUsername] = useAtom(profile.usernameAtom);
@@ -20,7 +19,7 @@ const PrivateWrapper = ({ children, login = true }: {children: JSX.Element, logi
   useEffect(() => {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      axios.post(`${config.API}/auth/user`)
+      axios.post(`${import.meta.env.VITE_API}/auth/user`)
         .then((res) => {
           if (res.status === 200) {
             const user = res.data.user;

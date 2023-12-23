@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import signupImage from '../assets/signup.jpg';
 import { keyframes } from 'styled-components';
 import axios from 'axios';
-import config from '../config';
 
 const fadeIn = keyframes`
   from {
@@ -141,7 +140,7 @@ const SignUp = () => {
   const handleSignUp = () => {
     if (password === confirmPassword) {
       console.log('Signing up with:', email, username, password);
-      axios.post(`${config.API}/auth/signup`, {
+      axios.post(`${import.meta.env.VITE_API}/auth/signup`, {
         email,
         username,
         password,
