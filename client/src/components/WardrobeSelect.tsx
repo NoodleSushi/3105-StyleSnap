@@ -25,12 +25,21 @@ const StyledWardrobeSelect = styled.select`
 
 interface WardrobeSelectProps {
   onChange: (value: string) => void;
+  choices: { id: number, name: string }[];
 }
 
-const WardrobeSelect: React.FC<WardrobeSelectProps> = ({ onChange }) => (
+const WardrobeSelect: React.FC<WardrobeSelectProps> = ({ choices, onChange }) => (
   <StyledWardrobeSelect onChange={(e) => onChange(e.target.value)}>
-    <option value="wardrobe1">Wardrobe 1</option>
-    <option value="wardrobe2">Wardrobe 2</option>
+    {choices.length === 0 ? (
+      <option value="" disabled selected>Create a new Wardrobe</option>
+    ) : (
+      <>
+        <option value="" disabled>Select a wardrobe</option>
+        {choices.map((option) => (
+          <option key={option.id} value={option.id}>{option.name}</option>
+        ))}
+      </>
+    )}
   </StyledWardrobeSelect>
 );
 

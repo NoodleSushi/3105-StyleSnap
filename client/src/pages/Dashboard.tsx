@@ -8,6 +8,7 @@ import ClothingItem from '../components/ClothingItem';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import ShimmerEffect from '../components/ShimmerEffect';
+import axios from 'axios';
 
 
 const PageContainer = styled.div`
@@ -105,83 +106,91 @@ const ViewMoreButton = styled.button`
 
 
 const Dashboard: React.FC = () => {
-  const [loaded, setLoaded] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Loading delay simulation
-    const timeout = setTimeout(() => {
-      setLoaded(true);
-    }, 1500);
-    return () => clearTimeout(timeout);
-  }, []);
-
   // Mock data for outfits
-  const outfits = [
-    {
-      id: 1, selectedCards: [
-        { id: 1, name: 'Card 1', imageUrl: undefined },
-        { id: 2, name: 'Card 2', imageUrl: undefined },
-        { id: 3, name: 'Card 3', imageUrl: undefined },
-      ],
-    },
-    {
-      id: 2, selectedCards: [
-        { id: 4, name: 'Card 4', imageUrl: undefined },
-        { id: 5, name: 'Card 5', imageUrl: undefined },
-        { id: 6, name: 'Card 6', imageUrl: undefined },
-      ]
-    },
-    {
-      id: 2, selectedCards: [
-        { id: 7, name: 'Card 7', imageUrl: undefined },
-        { id: 8, name: 'Card 8', imageUrl: undefined },
-        { id: 9, name: 'Card 9', imageUrl: undefined },
-      ]
-    },
+  const [outfitsDisplay, setOutfitsDisplay] = useState<{ id: number, selectedCards: {id: number, name: string, imageUrl: string}[] }[]>([]);
 
-  ];
-
-  const [menuItems, setMenuItems] = useState([
-    {
-      category: 'Outerwear', isOpen: false, cards: [
-        { id: 1, name: 'Card 1', imageUrl: undefined },
-        { id: 2, name: 'Card 2', imageUrl: undefined },
-      ]
-    },
-    {
-      category: 'Tops', isOpen: false, cards: [
-        { id: 3, name: 'Card 3', imageUrl: undefined },
-        { id: 4, name: 'Card 4', imageUrl: undefined },
-      ]
-    },
-    {
-      category: 'Bottoms', isOpen: false, cards: [
-        { id: 5, name: 'Card 5', imageUrl: undefined },
-        { id: 6, name: 'Card 6', imageUrl: undefined },
-      ]
-    },
-    {
-      category: 'Footwear', isOpen: false, cards: [
-        { id: 7, name: 'Card 7', imageUrl: undefined },
-        { id: 8, name: 'Card 8', imageUrl: undefined },
-      ]
-    },
-    {
-      category: 'Accessories', isOpen: false, cards: [
-        { id: 9, name: 'Card 9', imageUrl: undefined },
-        { id: 10, name: 'Card 10', imageUrl: undefined },
-      ]
-    },
-    {
-      category: 'Shoes', isOpen: false, cards: [
-        { id: 11, name: 'Card 11', imageUrl: undefined },
-        { id: 12, name: 'Card 12', imageUrl: undefined },
-      ]
-    },
-  ]);
+  const [menuItems, setMenuItems] = useState < { category: string, isOpen: boolean, cards: { id: number, name: string, imageUrl: string }[]}[]>([]);
 
   const [selectedWardrobe, setSelectedWardrobe] = useState<string>('wardrobe1');
+
+  const [wardrobeChoices, setWardrobeChoices] = useState<{ id: number, name: string }[]>([]);
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API}/user/wardrobes`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+    .then((res) => {
+      const wardrobe = res.data.wardrobes as { wardrobeId: number, owner: number, name: string }[];
+      setWardrobeChoices(
+        wardrobe.map((wardrobe) => ({
+          id: wardrobe.wardrobeId,
+          name: wardrobe.name,
+        })),
+      );
+      axios.get(`${import.meta.env.VITE_API}/user/outfits`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      })
+        .then((res) => { 
+          const outfits = res.data.outfits as { outfitId: number, name: string, clothes: { clothingId: number, name: string, image: string }[] }[];
+          const outfitsDisplay = outfits.map((outfit) => ({
+            id: outfit.outfitId,
+            selectedCards: outfit.clothes.map((clothing) => ({
+              id: clothing.clothingId,
+              name: clothing.name,
+              imageUrl: clothing.image,
+            })),
+          }));
+          console.log(outfitsDisplay);
+          setOutfitsDisplay(outfitsDisplay);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      setLoaded(true);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  }, []);
+
+  useEffect(() => {
+    setSelectedWardrobe(wardrobeChoices[0]?.id.toString());
+  }, [wardrobeChoices]);
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API}/clothing/categories`)
+      .then((res) => {
+        const categories = res.data.clothingCategories as { clothingCatId: number, name: string }[];
+        axios.get(`${import.meta.env.VITE_API}/wardrobes/${selectedWardrobe}/clothing`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
+          .then((res) => {
+            const clothing = res.data.clothing as { clothingId: number, name: string, image: string, clothingCatId: number }[];
+            const clothingByCategory = categories.map((category) => ({
+              category: category.name,
+              isOpen: false,
+              cards: clothing.filter((item) => item.clothingCatId === category.clothingCatId).map((item) => ({
+                id: item.clothingId,
+                name: item.name,
+                imageUrl: item.image,
+              })),
+            }));
+            setMenuItems(clothingByCategory);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+  }, [selectedWardrobe])
 
   const handleWardrobeChange = (value: string) => {
     setSelectedWardrobe(value);
@@ -226,8 +235,7 @@ const Dashboard: React.FC = () => {
       ) : (
       <>
       <HeaderContainer loaded={loaded}>
-
-        <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} />
+        <WardrobeSelect choices={wardrobeChoices} onChange={(value) => handleWardrobeChange(value)} />
       </HeaderContainer>
 
       <ContentContainer>
@@ -277,7 +285,7 @@ const Dashboard: React.FC = () => {
           </h2>
 
           <OutfitsContainer>
-            {outfits.map((outfit) => (
+            {outfitsDisplay.map((outfit) => (
               <Outfit
                 id={outfit.id}
                 key={outfit.id}
