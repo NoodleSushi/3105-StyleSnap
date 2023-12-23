@@ -199,6 +199,19 @@ export const getClothingCategory = async (clothingCatId: number): Promise<Clothi
   }
 }
 
+export const getClothingCategories = async (): Promise<ClothingCategory[]> => {
+  try {
+    const query = SQL`SELECT * FROM ClothingCategory`;
+    const [result] = await db.promise().query<(RowDataPacket)[]>(query);
+    return result.map(row => ({
+      clothingCatId: row.clothing_cat_id,
+      name: row.name,
+    }));
+  } catch (error) {
+    throw error;
+  }
+}
+
 export const createClothing = async (clothing: ClothingInput): Promise<number> => {
   try {
     const query = SQL`INSERT INTO Clothing (wardrobe_id, clothing_type_id, name, image) VALUES (${clothing.wardrobeId}, ${clothing.clothingTypeId}, ${clothing.name}, ${clothing.image})`;

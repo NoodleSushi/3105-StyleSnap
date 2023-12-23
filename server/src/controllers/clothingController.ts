@@ -37,6 +37,18 @@ export const getClothingType: RequestHandler = async (req, res) => {
   }
 }
 
+export const getClothingCategories: RequestHandler = async (req, res) => {
+  try {
+    const clothingCategories = await db.getClothingCategories();
+    return statusSuccessOK(res,
+      "Clothing categories retrieved.",
+      { clothingCategories }
+    );
+  } catch (err) {
+    return statusServerError(res, err);
+  }
+}
+
 export const getClothingCategory: RequestHandler = async (req, res) => {
   const statusValidErr = statusValidationError(req, res);
   if (statusValidErr)

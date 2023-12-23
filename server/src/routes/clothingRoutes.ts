@@ -3,7 +3,7 @@ import { authTokenValidator } from "../validators/authValidator";
 import { attachUser } from "../controllers/authController";
 import { clothingCategoryIdParamValidator, clothingIdParamValidator, clothingTypeIdParamValidator, clothingUpdateValidator, clothingValidator } from "../validators/clothingValidator";
 import { validateMulterUpload } from "../validators/generalValidator";
-import { createClothing, deleteClothing, getClothing, getClothingByWardrobe, getClothingCategory, getClothingType, getClothingTypeHierarchy, updateClothing } from "../controllers/clothingController";
+import { createClothing, deleteClothing, getClothing, getClothingByWardrobe, getClothingCategories, getClothingCategory, getClothingType, getClothingTypeHierarchy, updateClothing } from "../controllers/clothingController";
 import { upload } from "../multer";
 import { wardrobeIdParamValidator } from "../validators/wardrobeValidator";
 
@@ -11,6 +11,7 @@ const clothingRoutes = Router();
 
 clothingRoutes.get('/clothing/hierarchy', getClothingTypeHierarchy);
 clothingRoutes.get('/clothing/types/:clothingTypeId', clothingTypeIdParamValidator(), getClothingType);
+clothingRoutes.get('/clothing/categories', getClothingCategories);
 clothingRoutes.get('/clothing/categories/:clothingCategoryId', clothingCategoryIdParamValidator(), getClothingCategory);
 
 clothingRoutes.post('/user/wardrobes/:wardrobeId/clothing', authTokenValidator(), attachUser(), validateMulterUpload(upload.single('image')), wardrobeIdParamValidator(), clothingValidator(), createClothing);
