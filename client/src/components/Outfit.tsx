@@ -86,7 +86,7 @@ const DeleteButton = styled.button`
   position: absolute;
   top: 0;
   right: 0;
-  background-color: rgba(164, 164, 164, 0.2)
+  background-color: rgba(164, 164, 164, 0.2);
   color: #fff;
   border: none;
   font-size: 1rem;
