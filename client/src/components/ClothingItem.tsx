@@ -95,6 +95,7 @@ const CancelButton = styled.button`
 `;
 
 interface ClothingItemProps {
+  id: number;
   imageUrl: string;
   itemName: string;
   onClick: () => void;
@@ -105,7 +106,7 @@ interface ClothingItemProps {
   isMyOutfitsContext?: boolean;
 }
 
-const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick, onRemove, onDelete, showRemoveButton, createWardrobeContext, isMyOutfitsContext }) => {
+const ClothingItem: React.FC<ClothingItemProps> = ({ id, imageUrl, itemName, onClick, onRemove, onDelete, showRemoveButton, createWardrobeContext, isMyOutfitsContext }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -134,7 +135,7 @@ const ClothingItem: React.FC<ClothingItemProps> = ({ imageUrl, itemName, onClick
   };
 
   return (
-    <ClothingItemContainer onClick={handleClick}>
+    <ClothingItemContainer key={id} onClick={handleClick}>
       {(createWardrobeContext || isMyOutfitsContext) && <DeleteButton onClick={handleDeleteClick}>x</DeleteButton>}
       {isModalOpen && (
         <ModalOverlay>

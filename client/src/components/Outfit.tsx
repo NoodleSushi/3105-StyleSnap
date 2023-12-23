@@ -98,15 +98,16 @@ const DeleteButton = styled.button`
 `;
 
 interface OutfitProps {
-  selectedCards: string[];
-  handleCardClick: (card: string) => void;
-  handleRemoveCard: (card: string) => void;
+  id: number;
+  selectedCards: { id: number, name: string, imageUrl?: string }[];
+  handleCardClick: (cardId: number) => void;
+  handleRemoveCard: (cardId: number) => void;
   showRemoveButton: boolean;
   isMyOutfitsContext: boolean;
   isCreateOutfitPage?: boolean;
 }
 
-const Outfit: React.FC<OutfitProps> = ({ selectedCards, handleCardClick, handleRemoveCard, showRemoveButton, isCreateOutfitPage = false }) => {
+const Outfit: React.FC<OutfitProps> = ({ id, selectedCards, handleCardClick, handleRemoveCard, showRemoveButton, isCreateOutfitPage = false }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteClick = () => {
@@ -124,15 +125,16 @@ const Outfit: React.FC<OutfitProps> = ({ selectedCards, handleCardClick, handleR
 
   return (
     <>
-      <LargeCard isCreateOutfitPage={isCreateOutfitPage}>
+      <LargeCard key={`card${id}`} isCreateOutfitPage={isCreateOutfitPage}>
         <DeleteButton onClick={handleDeleteClick}>x</DeleteButton>
         {selectedCards.map((selectedCard, index) => (
           <ClothingItem
-            key={selectedCard}
-            imageUrl={`your_image_url_${index + 1}.jpg`}
-            itemName={selectedCard}
-            onClick={() => handleCardClick(selectedCard)}
-            onRemove={() => handleRemoveCard(selectedCard)}
+            key={selectedCard.id}
+            id={selectedCard.id}
+            imageUrl={selectedCard.imageUrl || `your_image_url_${index + 1}.jpg`}
+            itemName={selectedCard.name}
+            onClick={() => handleCardClick(selectedCard.id)}
+            onRemove={() => handleRemoveCard(selectedCard.id)}
             showRemoveButton={showRemoveButton}
             onDelete={() => {
               // Add onDelete logic here
@@ -142,7 +144,7 @@ const Outfit: React.FC<OutfitProps> = ({ selectedCards, handleCardClick, handleR
       </LargeCard>
 
       {isDeleteModalOpen && (
-        <ModalOverlay>
+        <ModalOverlay key={`modal${id}`}>
           <ModalContent>
             <p>Would you like to delete this outfit?</p>
             <YesButton onClick={handleYesClick}>Yes</YesButton>

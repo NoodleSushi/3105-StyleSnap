@@ -105,34 +105,80 @@ const ViewMoreButton = styled.button`
 
 
 const Dashboard: React.FC = () => {
-  const [loaded, setLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loaded, setLoaded] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     // Loading delay simulation
     const timeout = setTimeout(() => {
       setLoaded(true);
-      setIsLoading(false); // Set isLoading to false when content is loaded
     }, 1500);
     return () => clearTimeout(timeout);
   }, []);
 
   // Mock data for outfits
   const outfits = [
-    { id: 1, selectedCards: ['Card 1', 'Card 2', 'Card 3'] },
-    { id: 2, selectedCards: ['Card 4', 'Card 5', 'Card 6'] },
-    { id: 2, selectedCards: ['Card 4', 'Card 5', 'Card 6'] },
+    {
+      id: 1, selectedCards: [
+        { id: 1, name: 'Card 1', imageUrl: undefined },
+        { id: 2, name: 'Card 2', imageUrl: undefined },
+        { id: 3, name: 'Card 3', imageUrl: undefined },
+      ],
+    },
+    {
+      id: 2, selectedCards: [
+        { id: 4, name: 'Card 4', imageUrl: undefined },
+        { id: 5, name: 'Card 5', imageUrl: undefined },
+        { id: 6, name: 'Card 6', imageUrl: undefined },
+      ]
+    },
+    {
+      id: 2, selectedCards: [
+        { id: 7, name: 'Card 7', imageUrl: undefined },
+        { id: 8, name: 'Card 8', imageUrl: undefined },
+        { id: 9, name: 'Card 9', imageUrl: undefined },
+      ]
+    },
 
   ];
 
   const [menuItems, setMenuItems] = useState([
-    { category: 'Outerwear', isOpen: false, cards: ['Card 1', 'Card 2'] },
-    { category: 'Tops', isOpen: false, cards: ['Card 3', 'Card 4'] },
-    { category: 'Bottoms', isOpen: false, cards: ['Card 5', 'Card 6'] },
-    { category: 'Footwear', isOpen: false, cards: ['Card 7', 'Card 8'] },
-    { category: 'Accessories', isOpen: false, cards: ['Card 9', 'Card 10'] },
-    { category: 'Shoes', isOpen: false, cards: ['Card 11', 'Card 12'] },
+    {
+      category: 'Outerwear', isOpen: false, cards: [
+        { id: 1, name: 'Card 1', imageUrl: undefined },
+        { id: 2, name: 'Card 2', imageUrl: undefined },
+      ]
+    },
+    {
+      category: 'Tops', isOpen: false, cards: [
+        { id: 3, name: 'Card 3', imageUrl: undefined },
+        { id: 4, name: 'Card 4', imageUrl: undefined },
+      ]
+    },
+    {
+      category: 'Bottoms', isOpen: false, cards: [
+        { id: 5, name: 'Card 5', imageUrl: undefined },
+        { id: 6, name: 'Card 6', imageUrl: undefined },
+      ]
+    },
+    {
+      category: 'Footwear', isOpen: false, cards: [
+        { id: 7, name: 'Card 7', imageUrl: undefined },
+        { id: 8, name: 'Card 8', imageUrl: undefined },
+      ]
+    },
+    {
+      category: 'Accessories', isOpen: false, cards: [
+        { id: 9, name: 'Card 9', imageUrl: undefined },
+        { id: 10, name: 'Card 10', imageUrl: undefined },
+      ]
+    },
+    {
+      category: 'Shoes', isOpen: false, cards: [
+        { id: 11, name: 'Card 11', imageUrl: undefined },
+        { id: 12, name: 'Card 12', imageUrl: undefined },
+      ]
+    },
   ]);
 
   const [selectedWardrobe, setSelectedWardrobe] = useState<string>('wardrobe1');
@@ -141,13 +187,13 @@ const Dashboard: React.FC = () => {
     setSelectedWardrobe(value);
   };
 
-  const handleCardClick = (card: string) => {
-    console.log(`Card clicked: ${card}`);
+  const handleCardClick = (cardId: number) => {
+    console.log(`Card clicked: ${cardId}`);
     // Logic for handling cards
   };
 
-  const handleRemoveCard = (card: string) => {
-    console.log(`Remove card: ${card}`);
+  const handleRemoveCard = (cardId: number) => {
+    console.log(`Remove card: ${cardId}`);
     // Logic for removing card 
   };
 
@@ -175,7 +221,7 @@ const Dashboard: React.FC = () => {
     <PageContainer>
       <Navbar />
 
-      {isLoading ? (
+      {!loaded ? (
         <ShimmerEffect style={{ flex: 1, padding: '2rem' }} />
       ) : (
       <>
@@ -204,11 +250,12 @@ const Dashboard: React.FC = () => {
                   <RowContainer>
                     {item.cards.map((card, cardIndex) => (
                       <ClothingItem
+                        id={card.id}
                         key={cardIndex}
-                        imageUrl={`your_image_url_${cardIndex + 1}.jpg`}
-                        itemName={card}
-                        onClick={() => handleCardClick(card)}
-                        onRemove={() => handleRemoveCard(card)}
+                        imageUrl={card.imageUrl || `your_image_url_${cardIndex + 1}.jpg`}
+                        itemName={card.name}
+                        onClick={() => handleCardClick(card.id)}
+                        onRemove={() => handleRemoveCard(card.id)}
 
                         showRemoveButton={false} onDelete={function (): void {
                           throw new Error('Function not implemented.');
@@ -232,6 +279,7 @@ const Dashboard: React.FC = () => {
           <OutfitsContainer>
             {outfits.map((outfit) => (
               <Outfit
+                id={outfit.id}
                 key={outfit.id}
                 selectedCards={outfit.selectedCards}
                 handleCardClick={handleCardClick}
