@@ -7,6 +7,7 @@ import UploadItem from '../components/UploadItem';
 import AddWardrobe from '../components/AddWardrobe';
 import WardrobeSelect from '../components/WardrobeSelect';
 import ShimmerEffect from '../components/ShimmerEffect';
+import axios from 'axios';
 
 const PageContainer = styled.div`
   display: flex;
@@ -150,15 +151,58 @@ const CreateWardrobe: React.FC = () => {
   const [selectedWardrobe, setSelectedWardrobe] = useState<string>('wardrobe1');
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [wardrobeChoices, setWardrobeChoices] = useState<{ id: number, name: string }[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      await new Promise(resolve => setTimeout(resolve, 1500));
+    axios.get(`${import.meta.env.VITE_API}/user/wardrobes`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }).then((res) => {
+      const wardrobe = res.data.wardrobes as { wardrobeId: number, owner: number, name: string }[];
+      setWardrobeChoices(
+        wardrobe.map((wardrobe) => ({
+          id: wardrobe.wardrobeId,
+          name: wardrobe.name,
+        })),
+      );
       setIsLoading(false);
-    };
-
-    fetchData();
+    }).catch((err) => {
+      console.log(err);
+    });
   }, []);
+
+  useEffect(() => {
+    setSelectedWardrobe(wardrobeChoices[0]?.id.toString());
+  }, [wardrobeChoices])
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API}/clothing/categories`)
+      .then((res) => {
+        const categories = res.data.clothingCategories as { clothingCatId: number, name: string }[];
+        axios.get(`${import.meta.env.VITE_API}/wardrobes/${selectedWardrobe}/clothing`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
+          .then((res) => {
+            const clothing = res.data.clothing as { clothingId: number, name: string, image: string, clothingCatId: number }[];
+            const clothingByCategory = categories.map((category) => ({
+              category: category.name,
+              isOpen: false,
+              cards: clothing.filter((item) => item.clothingCatId === category.clothingCatId).map((item) => ({
+                id: item.clothingId,
+                name: item.name,
+                imageUrl: item.image,
+              })),
+            }));
+            setMenuItems(clothingByCategory);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+  }, [selectedWardrobe])
 
   const handleWardrobeChange = (value: string) => {
     setSelectedWardrobe(value);
@@ -182,14 +226,7 @@ const CreateWardrobe: React.FC = () => {
     { imageUrl: 'your_image_url_2.jpg', itemName: 'Item 2', showRemoveButton: false },
   ];
 
-  const [menuItems, setMenuItems] = useState([
-    { category: 'Outerwear', isOpen: false, cards: ['Card 1', 'Card 2'] },
-    { category: 'Tops', isOpen: false, cards: ['Card 3', 'Card 4'] },
-    { category: 'Bottoms', isOpen: false, cards: ['Card 5', 'Card 6'] },
-    { category: 'Footwear', isOpen: false, cards: ['Card 7', 'Card 8'] },
-    { category: 'Accessories', isOpen: false, cards: ['Card 9', 'Card 10'] },
-    { category: 'Shoes', isOpen: false, cards: ['Card 11', 'Card 12'] },
-  ]);
+  const [menuItems, setMenuItems] = useState < { category: string, isOpen: boolean, cards: { id: number, name: string, imageUrl: string }[]}[]>([]);
 
   const toggleMenu = (index: number) => {
     setMenuItems((prevItems) => {
@@ -201,11 +238,11 @@ const CreateWardrobe: React.FC = () => {
     });
   };
 
-  const handleCardClick = (card: string) => {
+  const handleCardClick = (card: number) => {
     console.log(`Clicked on ${card}`);
   };
 
-  const handleRemoveCard = (card: string) => {
+  const handleRemoveCard = (card: number) => {
     console.log(`Remove ${card}`);
   };
 
@@ -222,7 +259,7 @@ const CreateWardrobe: React.FC = () => {
         <>
           <ContentContainer>
             <LeftColumn>
-              <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} />
+            <WardrobeSelect choices={wardrobeChoices} onChange={(value) => handleWardrobeChange(value)} />
               <AddWardrobe onClick={() => console.log('Add Wardrobe clicked')} />
               <DeleteWardrobeButton onClick={handleDeleteWardrobeClick}>
                 Delete Wardrobe
@@ -244,11 +281,12 @@ const CreateWardrobe: React.FC = () => {
                         <RowContainer>
                           {item.cards.map((card, cardIndex) => (
                             <ClothingItem
+                              id={card.id}
                               key={cardIndex}
-                              imageUrl={`your_image_url_${cardIndex + 1}.jpg`}
-                              itemName={card}
-                              onClick={() => handleCardClick(card)}
-                              onRemove={() => handleRemoveCard(card)}
+                              imageUrl={card.imageUrl || `your_image_url_${cardIndex + 1}.jpg`}
+                              itemName={card.name}
+                              onClick={() => handleCardClick(card.id)}
+                              onRemove={() => handleRemoveCard(card.id)}
                               onDelete={() => handleDeleteClick()}
                               showRemoveButton={false}
                               createWardrobeContext={true}
