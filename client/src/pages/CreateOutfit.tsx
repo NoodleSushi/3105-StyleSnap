@@ -220,7 +220,22 @@ const CreateOutfit: React.FC = () => {
                   showDeleteButton={false}
               />
          
-          <SaveButton onClick={() => console.log('Save button clicked')} />
+          <SaveButton onClick={() => {
+            axios.post(`${import.meta.env.VITE_API}/user/outfits`, {
+              name: 'Untitled Outfit',
+              clothingIds: selectedCards.map((card) => card.id),
+            }, {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+              },
+            })
+              .then((res) => {
+                console.log(res);
+              })
+              .catch((err) => {
+                console.log(err);
+              });
+          }} />
         </RightColumn>
       </ContentContainer>
 
