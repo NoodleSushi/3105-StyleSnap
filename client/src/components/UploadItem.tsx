@@ -93,7 +93,6 @@ interface UploadItemProps {
 
 const UploadItem: React.FC<UploadItemProps> = ({ onUpload }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [clothingName, setClothingName] = useState<string>('');
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [clothingTypes, setClothingTypes] = useState<{ name: string, types: { clothingTypeId: number, name: string }[] }[]>([]);
   const [selectedClothingType, setSelectedClothingType] = useState<string>('');
@@ -127,7 +126,7 @@ const UploadItem: React.FC<UploadItemProps> = ({ onUpload }) => {
     event.preventDefault();
     // Logic to handle form submission, e.g., send data to server
     const data = new FormData();
-    data.append('name', clothingName);
+    data.append('name', 'Untitled Clothing');
     data.append('image', selectedImage!);
     data.append('clothingTypeId', selectedClothingType);
     onUpload(data);
@@ -162,15 +161,6 @@ const UploadItem: React.FC<UploadItemProps> = ({ onUpload }) => {
               {selectedImage && (
                 <Image src={URL.createObjectURL(selectedImage)} alt="Preview" />
               )}
-
-
-              {/* Input for item name */}
-              <UploadInput
-                type="text"
-                placeholder="Item Name"
-                onClick={stopPropagation}
-                onChange={(event) => setClothingName(event.target.value)}
-              />
               
               {/* Input for item type */}
               <StyledWardrobeSelect onChange={(e) => {
