@@ -9,7 +9,7 @@ paths:
   /auth/signup:
     post:
       tags:
-        - Auth
+        - Authentication
       summary: Sign up a new user
       requestBody:
         required: true
@@ -29,6 +29,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/BaseResponse"
               example:
+                success: true
                 message: User registration successful.
         422:
           description: Invalid user registration data.
@@ -44,23 +45,19 @@ paths:
                         items:
                           type: string
               example:
+                success: false
                 message: Invalid user registration data.
                 errors:
                   - Username must be at least 6 characters long.
                   - Password must be at least 8 characters long.
                   - Email must be a valid email address.
-        500:
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/500Response"
   /auth/login:
     post:
       tags:
-        - Auth
+        - Authentication
       summary: Login a user
       requestBody:
+        required: true
         content:
           application/json:
             schema:
@@ -89,29 +86,17 @@ paths:
                       accessToken:
                         type: string
               example:
+                success: true
                 message: User login successful.
                 accessToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJTdHlsZVNuYXAiLCJzdWIiOiJ
-        401:
-          description: Invalid user login data.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BaseResponse"
-              example:
-                message: Invalid username, email, and/or password.
-        500:
-          description: Internal server error.
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/500Response"
-  /auth/authtest:
+  /auth/user:
     post:
       tags:
-        - Auth
-      summary: Test authentication
+        - Authentication
+        - Current User
+      summary: Verify user authentication
       security:
-        - jwt: []
+        - bearerAuth: []
       responses:
         200:
           description: Authentication successful.
@@ -122,9 +107,10 @@ paths:
                   - $ref: "#/components/schemas/BaseResponse"
                   - type: object
                     properties:
-                      user:
-                        $ref: "#/components/schemas/UserInfo"
+                      wardrobeId:
+                        type: integer
               example:
+                success: true
                 message: Authentication successful.
                 user:
                   user_id: 1
@@ -138,12 +124,185 @@ paths:
               schema:
                 $ref: "#/components/schemas/BaseResponse"
               example:
+                success: false
                 message: Authentication failed.
+  /user/wardrobes:
+    post:
+      tags:
+        - Wardrobe
+        - Current User
+      summary: Add a new wardrobe of current User
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: My Wardrobe
+      responses:
+        201:
+          description: Wardrobe creation successful.
+          content:
+            application/json:
+              allOf:
+                - $ref: "#/components/schemas/BaseResponse"
+                - type: object
+                  properties:
+                    wardrobeId:
+                      type: integer
+              example:
+                success: true
+                message: Wardrobe creation successful.
+                wardrobeId: 1
+    get:
+      tags:
+        - Wardrobe
+        - Current User
+      summary: Get all wardrobes of current User
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Wardrobe retrieval successful.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      wardrobes:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            wardrobeId:
+                              type: integer
+                            owner:
+                              type: integer
+                            name:
+                              type: string
+              example:
+                success: true
+                message: User wardrobes retrieval successful.
+                wardrobes:
+                  - wardrobe_id: 1
+                    owner: 1
+                    name: My Wardrobe
+                  - wardrobe_id: 2
+                    owner: 1
+                    name: My Other Wardrobe
+  /wardrobes/{wardrobeId}:
+    get:
+      tags:
+        - Wardrobe
+      summary: Get a wardrobe
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wardrobeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Wardrobe retrieval successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WardrobeBase"
+              example:
+                success: true
+                message: Wardrobe retrieval successful.
+                wardrobe:
+                  wardrobe_id: 1
+                  owner: 1
+                  name: My Wardrobe
+        404:
+          description: Wardrobe not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: false
+                message: Wardrobe not found.
+    put:
+      tags:
+        - Wardrobe
+      summary: Update a wardrobe
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wardrobeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: My New Wardrobe
+      responses:
+        200:
+          description: Wardrobe update successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: true
+                message: Wardrobe update successful.
+        404:
+          description: Wardrobe not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: false
+                message: Wardrobe not found.
+    delete:
+      tags:
+        - Wardrobe
+      summary: Delete a wardrobe
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wardrobeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Wardrobe deletion successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: true
+                message: Wardrobe deletion successful.
 components:
   schemas:
     BaseResponse:
       type: object
       properties:
+        success:
+          type: boolean
         message:
           type: string
     500Response:
@@ -178,15 +337,22 @@ components:
             is_admin:
               type: boolean
               example: false
-
+    WardrobeBase:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            wardrobes:
+              type: object
+              properties:
+                wardrobeId:
+                  type: integer
+                owner:
+                  type: integer
+                name:
+                  type: string
   securitySchemes:
-    jwt:
-      type: apiKey
-      name: Authorization
-      in: header
-  
-securityDefinitions:
-  jwt:
-    type: apiKey
-    name: Authorization
-    in: header
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
