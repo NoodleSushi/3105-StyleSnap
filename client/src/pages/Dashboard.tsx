@@ -293,7 +293,8 @@ const Dashboard: React.FC = () => {
                 handleCardClick={handleCardClick}
                 handleRemoveCard={handleRemoveCard}
                 isMyOutfitsContext={true} 
-                showRemoveButton={false}            
+                showRemoveButton={false}
+                showDeleteButton={false}
               />
             ))}
           </OutfitsContainer>
