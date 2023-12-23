@@ -7,6 +7,7 @@ import WardrobeSelect from '../components/WardrobeSelect';
 import SaveButton from '../components/SaveOutfit';
 import ShimmerEffect from '../components/ShimmerEffect';
 import Footer from '../components/Footer';
+import axios from 'axios';
 
 const PageContainer = styled.div`
   display: flex;
@@ -68,27 +69,63 @@ const RowContainer = styled.div`
 
 const CreateOutfit: React.FC = () => {
   const [selectedWardrobe, setSelectedWardrobe] = useState<string>('');
-  const [menuItems, setMenuItems] = useState([
-    { category: 'Outerwear', isOpen: false, cards: ['Card 1', 'Card 2'] },
-    { category: 'Tops', isOpen: false, cards: ['Card 3', 'Card 4'] },
-    { category: 'Bottoms', isOpen: false, cards: ['Card 5', 'Card 6'] },
-    { category: 'Footwear', isOpen: false, cards: ['Card 7', 'Card 8'] },
-    { category: 'Accessories', isOpen: false, cards: ['Card 9', 'Card 10'] },
-    { category: 'Shoes', isOpen: false, cards: ['Card 11', 'Card 12'] },
-  ]);
-  const [selectedCards, setSelectedCards] = useState<string[]>([]);
+  const [menuItems, setMenuItems] = useState < { category: string, isOpen: boolean, cards: { id: number, name: string, imageUrl: string }[]}[]>([]);
+  const [selectedCards, setSelectedCards] = useState<{ id: number, name: string, imageUrl?: string }[]>([]);
   const [isLoading, setIsLoading] = useState(true); // New state for loading
+  const [wardrobeChoices, setWardrobeChoices] = useState<{ id: number, name: string }[]>([]);
 
   useEffect(() => {
-    // Simulate an asynchronous operation (e.g., fetching data)
-    const fetchData = async () => {
-      // Simulate a delay 
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      setIsLoading(false); // Set loading to false once data is fetched
-    };
-
-    fetchData();
+    axios.get(`${import.meta.env.VITE_API}/user/wardrobes`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+    .then((res) => {
+      const wardrobe = res.data.wardrobes as { wardrobeId: number, owner: number, name: string }[];
+      setWardrobeChoices(
+        wardrobe.map((wardrobe) => ({
+          id: wardrobe.wardrobeId,
+          name: wardrobe.name,
+        })),
+      );
+      setIsLoading(false);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   }, []);
+
+  useEffect(() => {
+    setSelectedWardrobe(wardrobeChoices[0]?.id.toString());
+  }, [wardrobeChoices]);
+
+  useEffect(() => {
+    axios.get(`${import.meta.env.VITE_API}/clothing/categories`)
+      .then((res) => {
+        const categories = res.data.clothingCategories as { clothingCatId: number, name: string }[];
+        axios.get(`${import.meta.env.VITE_API}/wardrobes/${selectedWardrobe}/clothing`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        })
+          .then((res) => {
+            const clothing = res.data.clothing as { clothingId: number, name: string, image: string, clothingCatId: number }[];
+            const clothingByCategory = categories.map((category) => ({
+              category: category.name,
+              isOpen: false,
+              cards: clothing.filter((item) => item.clothingCatId === category.clothingCatId).map((item) => ({
+                id: item.clothingId,
+                name: item.name,
+                imageUrl: item.image,
+              })),
+            }));
+            setMenuItems(clothingByCategory);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      });
+  }, [selectedWardrobe])
   
   const handleWardrobeChange = (value: string) => {
     setSelectedWardrobe(value);
@@ -104,12 +141,12 @@ const CreateOutfit: React.FC = () => {
     });
   };
 
-  const handleCardClick = (card: string) => {
+  const handleCardClick = (card: { id: number, name: string, imageUrl?: string }) => {
     setSelectedCards((prevSelectedCards) => {
       // Check if the card is already selected
-      if (prevSelectedCards.includes(card)) {
+      if (prevSelectedCards.some((selectedCard) => selectedCard.id === card.id)) {
         // If selected, remove it
-        return prevSelectedCards.filter((selectedCard) => selectedCard !== card);
+        return prevSelectedCards.filter((selectedCard) => selectedCard.id !== card.id);
       } else {
         // If not selected, add it
         return [...prevSelectedCards, card];
@@ -119,9 +156,9 @@ const CreateOutfit: React.FC = () => {
 
 
 
-  const handleRemoveCard = (card: string) => {
+  const handleRemoveCard = (card: { id: number, name: string, imageUrl?: string }) => {
     console.log('Removing card:', card); // Add this line for debugging
-    setSelectedCards((prevSelectedCards) => prevSelectedCards.filter((selectedCard) => selectedCard !== card));
+    setSelectedCards((prevSelectedCards) => prevSelectedCards.filter((selectedCard) => selectedCard.id !== selectedCard.id));
   };
 
   const handleDeleteClick = () => {
@@ -139,7 +176,7 @@ const CreateOutfit: React.FC = () => {
       <>
       <ContentContainer>
         <LeftColumn>
-        <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} />
+        <WardrobeSelect choices={wardrobeChoices} onChange={(value) => handleWardrobeChange(value)} />
           <VerticalMenu>
             {menuItems.map((item, index) => (
               <div key={index}>
@@ -153,9 +190,10 @@ const CreateOutfit: React.FC = () => {
                   <RowContainer>
                     {item.cards.map((card, cardIndex) => (
                       <ClothingItem
+                        id={card.id}
                         key={cardIndex}
-                        imageUrl={`your_image_url_${cardIndex + 1}.jpg`}
-                        itemName={card}
+                        imageUrl={card.imageUrl || `your_image_url_${cardIndex + 1}.jpg`}
+                        itemName={card.name}
                         onClick={() => handleCardClick(card)}
                         onRemove={() => handleRemoveCard(card)}
                         onDelete={() => handleDeleteClick()}
@@ -173,12 +211,13 @@ const CreateOutfit: React.FC = () => {
         <RightColumn>
             <h2>Create Your Outfit</h2>
 
-            <Outfit
+                <Outfit
                   selectedCards={selectedCards}
                   handleCardClick={handleCardClick}
                   handleRemoveCard={handleRemoveCard} 
                   showRemoveButton={true}
                   isMyOutfitsContext={false}
+                  showDeleteButton={false}
               />
          
           <SaveButton onClick={() => console.log('Save button clicked')} />

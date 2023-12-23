@@ -98,16 +98,17 @@ const DeleteButton = styled.button`
 `;
 
 interface OutfitProps {
-  id: number;
+  id?: number;
   selectedCards: { id: number, name: string, imageUrl?: string }[];
-  handleCardClick: (cardId: number) => void;
-  handleRemoveCard: (cardId: number) => void;
+  handleCardClick: (card: { id: number, name: string, imageUrl?: string }) => void;
+  handleRemoveCard: (card: { id: number, name: string, imageUrl?: string }) => void;
   showRemoveButton: boolean;
   isMyOutfitsContext: boolean;
   isCreateOutfitPage?: boolean;
+  showDeleteButton?: boolean;
 }
 
-const Outfit: React.FC<OutfitProps> = ({ id, selectedCards, handleCardClick, handleRemoveCard, showRemoveButton, isCreateOutfitPage = false }) => {
+const Outfit: React.FC<OutfitProps> = ({ id = 0, selectedCards, handleCardClick, handleRemoveCard, showRemoveButton, isCreateOutfitPage = false, showDeleteButton = true }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteClick = () => {
@@ -126,15 +127,16 @@ const Outfit: React.FC<OutfitProps> = ({ id, selectedCards, handleCardClick, han
   return (
     <>
       <LargeCard key={`card${id}`} isCreateOutfitPage={isCreateOutfitPage}>
-        <DeleteButton onClick={handleDeleteClick}>x</DeleteButton>
+        {showDeleteButton &&
+          <DeleteButton onClick={handleDeleteClick}>x</DeleteButton>}
         {selectedCards.map((selectedCard, index) => (
           <ClothingItem
             key={selectedCard.id}
             id={selectedCard.id}
             imageUrl={selectedCard.imageUrl || `your_image_url_${index + 1}.jpg`}
             itemName={selectedCard.name}
-            onClick={() => handleCardClick(selectedCard.id)}
-            onRemove={() => handleRemoveCard(selectedCard.id)}
+            onClick={() => handleCardClick(selectedCard)}
+            onRemove={() => handleRemoveCard(selectedCard)}
             showRemoveButton={showRemoveButton}
             onDelete={() => {
               // Add onDelete logic here
