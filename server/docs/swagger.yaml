@@ -296,6 +296,313 @@ paths:
               example:
                 success: true
                 message: Wardrobe deletion successful.
+  /user/outfits:
+    post:
+      tags:
+        - Outfit
+        - Current User
+      summary: Add a new outfit of current User
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutfitBase"
+      responses:
+        201:
+          description: Outfit creation successful.
+          content:
+            application/json:
+              allOf:
+                - $ref: "#/components/schemas/BaseResponse"
+                - type: object
+                  properties:
+                    outfitId:
+                      type: integer
+              example:
+                success: true
+                message: Outfit creation successful.
+                outfitId: 1
+    get:
+      tags:
+        - Outfit
+        - Current User
+      summary: Get all outfits of current User
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Outfit retrieval successful.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      outfits:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/OutfitBase"
+              example:
+                success: true
+                message: Outfit retrieval successful.
+  /outfits/{outfitId}:
+    get:
+      tags:
+        - Outfit
+      summary: Get an outfit
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: outfitId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Outfit retrieval successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OutfitExtended"
+              example:
+                success: true
+                message: Outfit retrieval successful.
+                outfit:
+                  outfit_id: 1
+                  name: My Outfit
+                  owner_id: 1
+                  clothes:
+                    - clothing_id: 1
+                      wardrobe_id: 1
+                      clothing_type_id: 1
+                      clothing_cat_id: 1
+                      name: My Shirt
+                      image: https://www.example.com/image.jpg
+                    - clothing_id: 2
+                      wardrobe_id: 1
+                      clothing_type_id: 2
+                      clothing_cat_id: 2
+                      name: My Pants
+                      image: https://www.example.com/image.jpg
+        404:
+          description: Outfit not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: false
+                message: Outfit not found.
+    patch:
+      tags:
+        - Outfit
+      summary: Update an outfit
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: outfitId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/OutfitBase"
+      responses:
+        200:
+          description: Outfit update successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: true
+                message: Outfit update successful.
+        404:
+          description: Outfit not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: false
+                message: Outfit not found.
+    delete:
+      tags:
+        - Outfit
+      summary: Delete an outfit
+      security:
+        - bearerAuth:
+  /wardrobes/{wardrobeId}/clothing:
+    post:
+      tags:
+        - Clothing
+        - Wardrobe
+      summary: Add a new clothing item to a wardrobe
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wardrobeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClothingBase"
+      responses:
+        201:
+          description: Clothing item creation successful.
+          content:
+            application/json:
+              allOf:
+                - $ref: "#/components/schemas/BaseResponse"
+                - type: object
+                  properties:
+                    clothingId:
+                      type: integer
+              example:
+                success: true
+                message: Clothing item creation successful.
+                clothingId: 1
+    get:
+      tags:
+        - Clothing
+        - Wardrobe
+      summary: Get all clothing items of a wardrobe
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: wardrobeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Clothing item retrieval successful.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      clothing:
+                        type: array
+                        items:
+                          $ref: "#/components/schemas/ClothingBase"
+              example:
+                success: true
+                message: Clothing item retrieval successful.
+  /clothing/{clothingId}:
+    get:
+      tags:
+        - Clothing
+      summary: Get a clothing item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clothingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Clothing item retrieval successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ClothingBase"
+              example:
+                success: true
+                message: Clothing item retrieval successful.
+                clothing:
+                  clothing_id: 1
+                  wardrobe_id: 1
+                  clothing_type_id: 1
+                  clothing_cat_id: 1
+                  name: My Shirt
+                  image: https://www.example.com/image.jpg
+        404:
+          description: Clothing item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: false
+                message: Clothing item not found.
+    patch:
+      tags:
+        - Clothing
+      summary: Update a clothing item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clothingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ClothingBase"
+      responses:
+        200:
+          description: Clothing item update successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: true
+                message: Clothing item update successful.
+        404:
+          description: Clothing item not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: false
+                message: Clothing item not found.
+    delete:
+      tags:
+        - Clothing
+      summary: Delete a clothing item
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: clothingId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Clothing item deletion successful.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: true
 components:
   schemas:
     BaseResponse:
@@ -350,6 +657,49 @@ components:
                 owner:
                   type: integer
                 name:
+                  type: string
+    OutfitBase:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            outfits:
+              type: object
+              properties:
+                outfitId:
+                  type: integer
+                name:
+                  type: string
+    OutfitExtended:
+      allOf:
+        - $ref: "#/components/schemas/OutfitBase"
+        - type: object
+          properties:
+            ownerId:
+              type: integer
+            clothes:
+              type: array
+              items:
+                $ref: "#/components/schemas/ClothingBase"
+    ClothingBase:
+      allof:
+        - $ref: "#/components/schemas/BaseResponse"
+        - type: object
+          properties:
+            clothing:
+              type: object
+              properties:
+                clothingId:
+                  type: integer
+                wardrobeId:
+                  type: integer
+                clothingTypeId:
+                  type: integer
+                clothingCatId:
+                  type: integer
+                name:
+                  type: string
+                image:
                   type: string
   securitySchemes:
     bearerAuth:
