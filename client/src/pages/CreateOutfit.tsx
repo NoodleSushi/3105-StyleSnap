@@ -158,7 +158,7 @@ const CreateOutfit: React.FC = () => {
 
   const handleRemoveCard = (card: { id: number, name: string, imageUrl?: string }) => {
     console.log('Removing card:', card); // Add this line for debugging
-    setSelectedCards((prevSelectedCards) => prevSelectedCards.filter((selectedCard) => selectedCard.id !== selectedCard.id));
+    setSelectedCards((prevSelectedCards) => prevSelectedCards.filter((selectedCard) => card.id !== selectedCard.id));
   };
 
   const handleDeleteClick = () => {
