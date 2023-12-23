@@ -152,6 +152,11 @@ const CreateWardrobe: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [wardrobeChoices, setWardrobeChoices] = useState<{ id: number, name: string }[]>([]);
+  const [wardrobeRefresh, setWardrobeRefresh] = useState(false);
+
+  const triggerWardrobeRefresh = () => {
+    setWardrobeRefresh((prev) => !prev);
+  }
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API}/user/wardrobes`, {
@@ -170,7 +175,7 @@ const CreateWardrobe: React.FC = () => {
     }).catch((err) => {
       console.log(err);
     });
-  }, []);
+  }, [wardrobeRefresh]);
 
   useEffect(() => {
     setSelectedWardrobe(wardrobeChoices[0]?.id.toString());
@@ -221,11 +226,6 @@ const CreateWardrobe: React.FC = () => {
     setIsDeleteModalOpen(false);
   };
 
-  const clothingItems = [
-    { imageUrl: 'your_image_url_1.jpg', itemName: 'Item 1', showRemoveButton: false },
-    { imageUrl: 'your_image_url_2.jpg', itemName: 'Item 2', showRemoveButton: false },
-  ];
-
   const [menuItems, setMenuItems] = useState < { category: string, isOpen: boolean, cards: { id: number, name: string, imageUrl: string }[]}[]>([]);
 
   const toggleMenu = (index: number) => {
@@ -260,7 +260,19 @@ const CreateWardrobe: React.FC = () => {
           <ContentContainer>
             <LeftColumn>
             <WardrobeSelect choices={wardrobeChoices} onChange={(value) => handleWardrobeChange(value)} />
-              <AddWardrobe onClick={() => console.log('Add Wardrobe clicked')} />
+                <AddWardrobe onClick={(name: string) => {
+                  axios.post(`${import.meta.env.VITE_API}/user/wardrobes`, {
+                    name,
+                  }, {
+                    headers: {
+                      Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                  }).then((res) => {
+                    triggerWardrobeRefresh();
+                  }).catch((err) => {
+                    console.log(err);
+                  });
+                }} />
               <DeleteWardrobeButton onClick={handleDeleteWardrobeClick}>
                 Delete Wardrobe
               </DeleteWardrobeButton>
