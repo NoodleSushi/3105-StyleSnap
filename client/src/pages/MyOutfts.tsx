@@ -7,6 +7,7 @@ import signupImage from '../assets/signup.jpg';
 import { useNavigate } from 'react-router-dom';
 import Footer from '../components/Footer';
 import ShimmerEffect from '../components/ShimmerEffect';
+import axios from 'axios';
 
 const PageContainer = styled.div`
   display: flex;
@@ -63,42 +64,50 @@ const OutfitsContainer = styled.div`
 
 const MyOutfits: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // const [selectedWardrobe, setSelectedWardrobe] = useState<string>('wardrobe1');
+  const [outfitsDisplay, setOutfitsDisplay] = useState<{ id: number, selectedCards: {id: number, name: string, imageUrl: string}[] }[]>([]);
 
   useEffect(() => {
-    // Loading delay simulation
-    const timeout = setTimeout(() => {
-      setLoaded(true);
-      setIsLoading(false); // Set isLoading to false when content is loaded
-    }, 1500);
-    return () => clearTimeout(timeout);
+    axios.get(`${import.meta.env.VITE_API}/user/outfits`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    })
+      .then((res) => { 
+        const outfits = res.data.outfits as { outfitId: number, name: string, clothes: { clothingId: number, name: string, image: string }[] }[];
+        const outfitsDisplay = outfits.map((outfit) => ({
+          id: outfit.outfitId,
+          selectedCards: outfit.clothes.map((clothing) => ({
+            id: clothing.clothingId,
+            name: clothing.name,
+            imageUrl: clothing.image,
+          })),
+        }));
+        console.log(outfitsDisplay);
+        setOutfitsDisplay(outfitsDisplay);
+        setLoaded(true);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }, []);
 
-  // Mock data for outfits
-  const outfits = [
-    { id: 1, selectedCards: ['Card 1', 'Card 2', 'Card 3', 'Card 3', 'Card 3'] },
-    { id: 2, selectedCards: ['Card 4', 'Card 5', 'Card 6'] },
-    { id: 2, selectedCards: ['Card 4', 'Card 5', 'Card 6'] }
-  ];
-
-  const [selectedWardrobe, setSelectedWardrobe] = useState<string>('wardrobe1');
-
-  const handleWardrobeChange = (value: string) => {
-    setSelectedWardrobe(value);
-  };
+  // const handleWardrobeChange = (value: string) => {
+  //   setSelectedWardrobe(value);
+  // };
 
   const handleCreateOutfitView = () => {
     navigate("/create-outfit")
   };
 
-  const handleCardClick = (card: string) => {
+  const handleCardClick = (card: { id: number, name: string, imageUrl?: string }) => {
     console.log(`Card clicked: ${card}`);
     // Logic for handling cards
   };
 
-  const handleRemoveCard = (card: string) => {
+  const handleRemoveCard = (card: { id: number, name: string, imageUrl?: string }) => {
     console.log(`Remove card: ${card}`);
     // Add your logic for removing card 
   };
@@ -107,12 +116,12 @@ const MyOutfits: React.FC = () => {
     <PageContainer>
       <Navbar />
 
-      {isLoading ? (
+      {!loaded ? (
         <ShimmerEffect style={{ flex: 1, padding: '2rem' }} />
       ) : (
       <>
       <HeaderContainer loaded={loaded}>
-        <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} />
+        {/* <WardrobeSelect onChange={(value) => handleWardrobeChange(value)} /> */}
       </HeaderContainer>
 
       <ContentContainer>
@@ -121,14 +130,15 @@ const MyOutfits: React.FC = () => {
       </CreateNewOutfitButton>
 
         <OutfitsContainer>
-          {outfits.map((outfit) => (
+          {outfitsDisplay.map((outfit) => (
             <Outfit
+              id={outfit.id}
               key={outfit.id}
               selectedCards={outfit.selectedCards}
               handleCardClick={handleCardClick}
               handleRemoveCard={handleRemoveCard}
               isMyOutfitsContext={true} 
-              showRemoveButton={false}
+              showRemoveButton={false}            
             />
           ))}
         </OutfitsContainer>
