@@ -238,13 +238,19 @@ export const updateClothing = async (clothing: ClothingUpdateInput): Promise<boo
 
 export const getClothing = async (clothingId: number): Promise<Clothing | null> => {
   try {
-    const query = SQL`SELECT * FROM Clothing WHERE clothing_id = ${clothingId}`;
+    const query = SQL`
+      SELECT c.*, ct.clothing_cat_id
+      FROM Clothing c
+      INNER JOIN ClothingType ct ON c.clothing_type_id = ct.clothing_type_id
+      WHERE c.clothing_id = ${clothingId}
+    `;
     const [result] = await db.promise().query<(RowDataPacket)[]>(query);
     const row = result && result[0];
     return row && {
       clothingId: row.clothing_id,
       wardrobeId: row.wardrobe_id,
       clothingTypeId: row.clothing_type_id,
+      clothingCatId: row.clothing_cat_id,
       name: row.name,
       image: row.image,
     } || null;
@@ -255,12 +261,18 @@ export const getClothing = async (clothingId: number): Promise<Clothing | null> 
 
 export const getClothingByWardrobe = async (wardrobeId: number): Promise<Clothing[]> => {
   try {
-    const query = SQL`SELECT * FROM Clothing WHERE wardrobe_id = ${wardrobeId}`;
+    const query = SQL`
+      SELECT c.*, ct.clothing_cat_id
+      FROM Clothing c
+      INNER JOIN ClothingType ct ON c.clothing_type_id = ct.clothing_type_id
+      WHERE c.wardrobe_id = ${wardrobeId}
+    `;
     const [result] = await db.promise().query<(RowDataPacket)[]>(query);
     return result.map(row => ({
       clothingId: row.clothing_id,
       wardrobeId: row.wardrobe_id,
       clothingTypeId: row.clothing_type_id,
+      clothingCatId: row.clothing_cat_id,
       name: row.name,
       image: row.image,
     }));
@@ -409,12 +421,18 @@ export const updateOutfitClothes = async (outfitId: number, clothingIds: number[
 
 export const getOutfitClothes = async (outfitId: number): Promise<Clothing[]> => {
   try {
-    const query = SQL`SELECT * FROM Clothing WHERE clothing_id IN (SELECT clothing_id FROM OutfitClothes WHERE outfit_id = ${outfitId})`;
-    const [result] = await db.promise().query<(RowDataPacket)[]>(query);
+    const query = SQL`
+      SELECT c.*, ct.clothing_cat_id
+      FROM Clothing c
+      INNER JOIN ClothingType ct ON c.clothing_type_id = ct.clothing_type_id
+      WHERE c.clothing_id IN (SELECT clothing_id FROM OutfitClothes WHERE outfit_id = ${outfitId})
+    `;
+    const [result] = await db.promise().query<(RowDataPacket & { clothing_cat_id: number })[]>(query);
     return result.map(row => ({
       clothingId: row.clothing_id,
       wardrobeId: row.wardrobe_id,
       clothingTypeId: row.clothing_type_id,
+      clothingCatId: row.clothing_cat_id,
       name: row.name,
       image: row.image,
     }));

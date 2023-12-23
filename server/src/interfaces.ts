@@ -36,6 +36,7 @@ export interface Clothing {
   clothingId: number;
   wardrobeId: number;
   clothingTypeId: number;
+  clothingCatId: number;
   name: string;
   image: string;
 }
