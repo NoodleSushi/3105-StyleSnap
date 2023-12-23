@@ -153,9 +153,14 @@ const CreateWardrobe: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [wardrobeChoices, setWardrobeChoices] = useState<{ id: number, name: string }[]>([]);
   const [wardrobeRefresh, setWardrobeRefresh] = useState(false);
+  const [clothesRefresh, setClothesRefresh] = useState(false);
 
   const triggerWardrobeRefresh = () => {
     setWardrobeRefresh((prev) => !prev);
+  }
+
+  const triggerClothesRefresh = () => {
+    setClothesRefresh((prev) => !prev);
   }
 
   useEffect(() => {
@@ -207,7 +212,7 @@ const CreateWardrobe: React.FC = () => {
             console.log(err);
           });
       });
-  }, [selectedWardrobe])
+  }, [selectedWardrobe, clothesRefresh])
 
   const handleWardrobeChange = (value: string) => {
     setSelectedWardrobe(value);
@@ -222,7 +227,7 @@ const CreateWardrobe: React.FC = () => {
       headers: {
         Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
-    }).then((res) => {
+    }).then(() => {
       triggerWardrobeRefresh();
     }).catch((err) => {
       console.log(err);
@@ -275,7 +280,7 @@ const CreateWardrobe: React.FC = () => {
                     headers: {
                       Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
-                  }).then((res) => {
+                  }).then(() => {
                     triggerWardrobeRefresh();
                   }).catch((err) => {
                     console.log(err);
@@ -317,7 +322,20 @@ const CreateWardrobe: React.FC = () => {
                     </div>
                   ))}
 
-                  <UploadItem onClick={() => console.log('Upload button clicked')} />
+                    <UploadItem
+                      onUpload={(data) => {
+                        axios.post(`${import.meta.env.VITE_API}/wardrobes/${selectedWardrobe}/clothing`, data, {
+                          headers: {
+                            'Content-Type': 'multipart/form-data',
+                            Authorization: `Bearer ${localStorage.getItem('token')}`,
+                          },
+                        }).then(() => {
+                          triggerClothesRefresh();
+                        }).catch((err) => {
+                          console.log(err);
+                        })
+                      }}
+                    />
                 </VerticalMenu>
               </WardrobeInfoContainer>
             </RightColumn>
