@@ -603,6 +603,183 @@ paths:
                 $ref: "#/components/schemas/BaseResponse"
               example:
                 success: true
+  /clothing/hierarchy:
+    get:
+      tags:
+        - Clothing
+      summary: Get clothing hierarchy
+      responses:
+        200:
+          description: Clothing hierarchy retrieval successful.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      clothingHierarchy:
+                        type: object
+                        properties:
+                          clothingTypes:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                clothingTypeId:
+                                  type: integer
+                                name:
+                                  type: string
+                                clothingCategories:
+                                  type: array
+                                  items:
+                                    type: object
+                                    properties:
+                                      clothingCatId:
+                                        type: integer
+                                      name:
+                                        type: string
+              example:
+                success: true
+                message: Clothing hierarchy retrieval successful.
+                clothingHierarchy:
+                  clothingTypes:
+                    - clothing_type_id: 1
+                      name: Top
+                      clothing_categories:
+                        - clothing_cat_id: 1
+                          name: Shirt
+                        - clothing_cat_id: 2
+                          name: Jacket
+                    - clothing_type_id: 2
+                      name: Bottom
+                      clothing_categories:
+                        - clothing_cat_id: 3
+                          name: Pants
+                        - clothing_cat_id: 4
+                          name: Shorts
+  /clothing/types/{clothingTypeId}:
+    get:
+      tags:
+        - Clothing
+      summary: Get clothing category of a clothing type
+      parameters:
+        - name: clothingTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Clothing category retrieval successful.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      clothingCategories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            clothingCatId:
+                              type: integer
+                            name:
+                              type: string
+              example:
+                success: true
+                message: Clothing category retrieval successful.
+                clothingCategories:
+                  - clothing_cat_id: 1
+                    name: Shirt
+                  - clothing_cat_id: 2
+                    name: Jacket
+        404:
+          description: Clothing type not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: false
+                message: Clothing type not found.
+  /clothing/categories:
+    get:
+      tags:
+        - Clothing
+      summary: Get all clothing categories
+      responses:
+        200:
+          description: Clothing category retrieval successful.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      clothingCategories:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            clothingCatId:
+                              type: integer
+                            name:
+                              type: string
+              example:
+                success: true
+                message: Clothing category retrieval successful.
+                clothingCategories:
+                  - clothing_cat_id: 1
+                    name: Shirt
+                  - clothing_cat_id: 2
+                    name: Jacket
+  /clothing/categories/{clothingCategoryId}:
+    get:
+      tags:
+        - Clothing
+      summary: Get a clothing category
+      parameters:
+        - name: clothingCategoryId
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Clothing category retrieval successful.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: "#/components/schemas/BaseResponse"
+                  - type: object
+                    properties:
+                      clothingCategory:
+                        type: object
+                        properties:
+                          clothingCatId:
+                            type: integer
+                          name:
+                            type: string
+              example:
+                success: true
+                message: Clothing category retrieval successful.
+                clothingCategory:
+                  clothing_cat_id: 1
+                  name: Shirt
+        404:
+          description: Clothing category not found.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+              example:
+                success: false
+                message: Clothing category not found.
 components:
   schemas:
     BaseResponse:
