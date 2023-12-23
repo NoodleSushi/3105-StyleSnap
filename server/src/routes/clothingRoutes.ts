@@ -14,7 +14,7 @@ clothingRoutes.get('/clothing/types/:clothingTypeId', clothingTypeIdParamValidat
 clothingRoutes.get('/clothing/categories', getClothingCategories);
 clothingRoutes.get('/clothing/categories/:clothingCategoryId', clothingCategoryIdParamValidator(), getClothingCategory);
 
-clothingRoutes.post('/user/wardrobes/:wardrobeId/clothing', authTokenValidator(), attachUser(), validateMulterUpload(upload.single('image')), wardrobeIdParamValidator(), clothingValidator(), createClothing);
+clothingRoutes.post('/wardrobes/:wardrobeId/clothing', authTokenValidator(), attachUser(), validateMulterUpload(upload.single('image')), wardrobeIdParamValidator(), clothingValidator(), createClothing);
 
 clothingRoutes.get('/clothing/:clothingId', authTokenValidator(), attachUser(), clothingIdParamValidator(), getClothing);
 clothingRoutes.get('/wardrobes/:wardrobeId/clothing', authTokenValidator(), attachUser(), wardrobeIdParamValidator(), getClothingByWardrobe);
