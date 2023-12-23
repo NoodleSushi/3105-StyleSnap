@@ -259,8 +259,17 @@ const CreateWardrobe: React.FC = () => {
     console.log(`Remove ${card}`);
   };
 
-  const handleDeleteClick = () => {
+  const handleDeleteClick = (cardId: number) => {
     console.log('Delete button clicked');
+    axios.delete(`${import.meta.env.VITE_API}/clothing/${cardId}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }).then(() => {
+      triggerClothesRefresh();
+    }).catch((err) => {
+      console.log(err);
+    });
   };
 
   return (
@@ -312,7 +321,7 @@ const CreateWardrobe: React.FC = () => {
                               itemName={card.name}
                               onClick={() => handleCardClick(card.id)}
                               onRemove={() => handleRemoveCard(card.id)}
-                              onDelete={() => handleDeleteClick()}
+                              onDelete={() => handleDeleteClick(card.id)}
                               showRemoveButton={false}
                               createWardrobeContext={true}
                             />
