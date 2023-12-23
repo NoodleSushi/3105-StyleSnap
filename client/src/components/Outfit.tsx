@@ -102,13 +102,14 @@ interface OutfitProps {
   selectedCards: { id: number, name: string, imageUrl?: string }[];
   handleCardClick: (card: { id: number, name: string, imageUrl?: string }) => void;
   handleRemoveCard: (card: { id: number, name: string, imageUrl?: string }) => void;
+  handleDeleteCard?: (card: { id: number, name: string, imageUrl?: string }) => void;
   showRemoveButton: boolean;
   isMyOutfitsContext: boolean;
   isCreateOutfitPage?: boolean;
   showDeleteButton?: boolean;
 }
 
-const Outfit: React.FC<OutfitProps> = ({ id = 0, selectedCards, handleCardClick, handleRemoveCard, showRemoveButton, isCreateOutfitPage = false, showDeleteButton = true }) => {
+const Outfit: React.FC<OutfitProps> = ({ id = 0, selectedCards, handleCardClick, handleRemoveCard, handleDeleteCard, showRemoveButton, isCreateOutfitPage = false, showDeleteButton = true }) => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   const handleDeleteClick = () => {
@@ -117,6 +118,7 @@ const Outfit: React.FC<OutfitProps> = ({ id = 0, selectedCards, handleCardClick,
 
   const handleYesClick = () => {
     // Delete outfit logic here
+    handleDeleteCard && handleDeleteCard(selectedCards[0]);
     setIsDeleteModalOpen(false);
   };
 

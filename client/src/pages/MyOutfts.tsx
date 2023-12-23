@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Navbar from '../components/TopNav';
-import WardrobeSelect from '../components/WardrobeSelect';
 import Outfit from '../components/Outfit';
 import styled from 'styled-components';
 import signupImage from '../assets/signup.jpg';
@@ -65,9 +64,12 @@ const OutfitsContainer = styled.div`
 const MyOutfits: React.FC = () => {
   const [loaded, setLoaded] = useState(false);
   const navigate = useNavigate();
+  const [outfitsDisplay, setOutfitsDisplay] = useState<{ id: number, selectedCards: { id: number, name: string, imageUrl: string }[] }[]>([]);
+  const [refresh, setRefresh] = useState(false);
 
-  // const [selectedWardrobe, setSelectedWardrobe] = useState<string>('wardrobe1');
-  const [outfitsDisplay, setOutfitsDisplay] = useState<{ id: number, selectedCards: {id: number, name: string, imageUrl: string}[] }[]>([]);
+  const triggerRefresh = () => {
+    setRefresh((prev) => (!prev));
+  };
 
   useEffect(() => {
     axios.get(`${import.meta.env.VITE_API}/user/outfits`, {
@@ -92,7 +94,7 @@ const MyOutfits: React.FC = () => {
       .catch((err) => {
         console.log(err);
       });
-  }, []);
+  }, [refresh]);
 
   // const handleWardrobeChange = (value: string) => {
   //   setSelectedWardrobe(value);
@@ -137,6 +139,18 @@ const MyOutfits: React.FC = () => {
               selectedCards={outfit.selectedCards}
               handleCardClick={handleCardClick}
               handleRemoveCard={handleRemoveCard}
+              handleDeleteCard={() => { 
+                axios.delete(`${import.meta.env.VITE_API}/outfits/${outfit.id}`, {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`,
+                  },
+                }).then((res) => {
+                  triggerRefresh();
+                  console.log(res);
+                }).catch((err) => {
+                  console.log(err);
+                });
+              }}
               isMyOutfitsContext={true} 
               showRemoveButton={false}            
             />
