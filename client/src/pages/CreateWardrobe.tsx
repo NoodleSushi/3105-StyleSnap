@@ -218,7 +218,15 @@ const CreateWardrobe: React.FC = () => {
   };
 
   const handleYesClick = () => {
-    console.log('Wardrobe deleted');
+    axios.delete(`${import.meta.env.VITE_API}/wardrobes/${selectedWardrobe}`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    }).then((res) => {
+      triggerWardrobeRefresh();
+    }).catch((err) => {
+      console.log(err);
+    });
     setIsDeleteModalOpen(false);
   };
 
